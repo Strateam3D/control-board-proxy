@@ -1,0 +1,55 @@
+@startuml
+
+skinparam packageStyle rectangle
+skinparam noteFontSize 9
+scale 1.333
+title MqttStack
+
+set namespaceSeparator ::
+
+
+namespace mqtt #EEDDDD{
+    MQTTStack *-- async_client
+    MQTTStack *-- thread
+    MQTTStack *-- TransactionUser
+
+    CallbackAdaptor --|> mqtt_callback
+    CallbackAdaptor --|> mqtt_iaction_listener
+
+    CallbackAdaptor o-- TransactionUser
+    TransactionUser *-- MessageFifo
+    MQTTStack *-- CallbackAdaptor
+    CallbackAdaptor o-- async_client
+    AbstractTU --|> TransactionUser
+    AbstractTU *-- thread
+    
+    class CallbackAdaptor{
+        + void reconnect()
+        + void on_failure(const token& tok)
+        + void on_success(const mqtt::token& tok)
+        + void connection_lost(const std::string& cause)
+        + void message_arrived(const_message_ptr msg)
+
+    }
+
+    class TransactionUser{
+        + bool isForMe( const_message_ptr msg )
+        + void post( const_message_ptr msg )
+    }
+
+    class MQTTStack{
+        + void publish( message_ptr msg )
+        + void subscribe( const string& topicFilter, int qos )
+    }
+
+    
+    class AbstractTU{
+        - std::thread thrd_
+
+        + void run()
+        + void dispatch(const_message_ptr msg) = 0
+    }
+
+}
+
+@enduml

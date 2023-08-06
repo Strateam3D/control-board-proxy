@@ -1,0 +1,82 @@
+@startuml
+skinparam packageStyle rectangle
+skinparam noteFontSize 9
+scale 1.333
+
+set namespaceSeparator ::
+
+
+title equipment
+
+
+namespace equipment #EEDDDD {
+    enum AxisType{
+        X,
+        Y,
+        Z
+    }
+
+    interface EquipmentInterface{
+        + AxisInterface axis( AxisId id )
+    }
+
+    class Listenable{
+        + bool subscribe( ListenerInterface*l )
+        + void unsubscribe( ListenerInterface*l )
+
+        - void notify(F&& func, Args&&... args);
+    }
+
+    interface ListenerInterface{
+        + void motionDone( MotionResult motret )
+        + void motionToDone( MotionResult motret )
+        + void moveHomeDone(MotionResult motret)
+        + void moveToZeroDone( MotionResult motret )
+    }
+
+    interface AxisInterface{
+        + MotionResult move( PositionT const& offset, double speed=-1, double accel=-1, double decel=-1 )
+        + MotionResult moveTo( PositionT const& target, double speed=-1, double accel=-1, double decel=-1 )
+        + MotionResult moveZero( double speed=-1, double accel=-1, double decel=-1, int dir = -1 )
+        + MotionResult moveHome( double speed=-1, double accel=-1, double decel=-1 )
+        + void stop()
+        + PositionT position()
+        + PositionT homePosition()
+        + void setHomePosition(PositionT pos)
+    }
+
+    abstract class AsyncSerialPort{
+        +  void open(const std::string& devname, unsigned int baud_rate);
+        + void close();
+        + void write(const char *data, size_t size);
+
+    }
+
+    class RWAsyncSerialPort{
+        + void setCallback( F f )
+    }
+
+    class Transport{
+        + bool openSerialPort();
+        + bool reconnect();
+        + bool openConnection();
+        + RJDocument sendRequestGetResponse( RJDocument const& req )
+        --
+        - void readCallback();
+    }
+
+    Listenable o-- ListenerInterface : has one
+    DLPAxis --|> AxisInterface
+    DLPEquipment --|> EquipmentInterface
+    AxisInterface --|> Listenable
+    AsyncSerialPort *-- AsyncSerialImpl
+    RWAsyncSerial --|> AsyncSerialPort
+    DLPEquipment *-- Transport
+    Transport *-- RWAsyncSerialPort
+}
+
+
+
+
+
+@enduml
