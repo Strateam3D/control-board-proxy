@@ -32,6 +32,8 @@ namespace app #CCE9FF{
         # void moveToZeroDone( MotionResult motret )
     }
 
+    
+
 
     Dialog --|> equipment::ListenerInterface : implements
     Dialog o-- equipment::EquipmentInterface : uses reference

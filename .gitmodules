@@ -1,0 +1,9 @@
+[submodule "3rdParty/paho_mqtt_cpp"]
+	path = 3rdParty/paho_mqtt_cpp
+	url = https://github.com/eclipse/paho.mqtt.cpp.git
+[submodule "3rdParty/rj"]
+	path = 3rdParty/rj
+	url = https://github.com/sledgeh/rapidjson.git
+[submodule "src/eq-common"]
+	path = src/eq-common
+	url = git@github.com:Strateam3D/eq-common.git
