@@ -1,4 +1,4 @@
-@startuml
+@startuml equipment
 skinparam packageStyle rectangle
 skinparam noteFontSize 9
 scale 1.333
@@ -17,7 +17,7 @@ namespace equipment #EEDDDD {
     }
 
     interface EquipmentInterface{
-        + AxisInterface axis( AxisId id )
+        + AxisInterface axis( AxisType id )
     }
 
     class Listenable{
@@ -68,10 +68,12 @@ namespace equipment #EEDDDD {
     Listenable o-- ListenerInterface : has one
     DLPAxis --|> AxisInterface
     DLPEquipment --|> EquipmentInterface
+    DLPEquipment *-- DLPAxis : has many, X,Y,Z
     AxisInterface --|> Listenable
     AsyncSerialPort *-- AsyncSerialImpl
-    RWAsyncSerial --|> AsyncSerialPort
+    RWAsyncSerialPort --|> AsyncSerialPort
     DLPEquipment *-- Transport
+    DLPAxis o-- Transport
     Transport *-- RWAsyncSerialPort
 }
 

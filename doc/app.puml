@@ -1,0 +1,45 @@
+@startuml app
+
+skinparam packageStyle rectangle
+skinparam noteFontSize 9
+scale 1.333
+
+set namespaceSeparator ::
+
+
+title app
+
+!include ./equipment.puml
+!include ./mqtt_stack.puml
+
+
+namespace app #CCE9FF{
+    class Dialog{
+        - equipment::EquipmentInterface& eq_
+        - PointerHandler h_
+        --
+        <b>ctor</b>
+        + Dialog(string dialogId, equipment::EquipmentInterface eq )
+        --
+        <b>interface</b>
+        + void dispatch(RJPointer topic, RjDocument data)
+
+        --
+        <b>ListenerInterface</b>
+        # void motionDone( MotionResult motret )
+        # void motionToDone( MotionResult motret )
+        # void moveHomeDone(MotionResult motret)
+        # void moveToZeroDone( MotionResult motret )
+    }
+
+
+    Dialog --|> equipment::ListenerInterface : implements
+    Dialog o-- equipment::EquipmentInterface : uses reference
+    ControlBoardTU --|> mqtt::AbstractTU
+    Dialog o-- ControlBoardTU
+    ControlBoardTU *-- equipment::DLPEquipment
+}
+
+
+
+@enduml
