@@ -2,6 +2,9 @@
 
 namespace strateam{
     namespace equipment{
-        class UsbSerialPortTransport{};
+        template<typename Tag>
+        class UsbSerialPortTransport{
+            
+        };
     }
 }

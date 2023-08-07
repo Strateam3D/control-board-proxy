@@ -17,8 +17,6 @@ namespace strateam{
             }
             
         protected:
-            /*/// Since C++17 we can do it in some other way.
-            */
             template<typename F, typename... Args>
             void notify(F&& func, Args&&... args){
                 assert(listener_);

@@ -21,12 +21,12 @@ namespace strateam{
 			using SourceType = rj::Document;
 		public:
             JsonMessage( SourceType const& doc ){
-                setSource( doc );
+                document_.CopyFrom(doc, document_.GetAllocator());
+				encode();
             }
 
-			void setSource(SourceType const& doc) {
-				document_.CopyFrom(doc, document_.GetAllocator());
-				encode();
+			static JsonMessage fromSource(SourceType const& doc) {
+				return JsonMessage( doc );
 			}
 
 			SourceType const& getSource()const {
@@ -72,11 +72,11 @@ namespace strateam{
 			using SourceType = std::string;
 		public:// == RawMessage ==
             TextMessage( SourceType const& source ){
-                setSource( source );
+                document_ = source;
             }
             
-			void setSource(SourceType const& doc) {
-				document_ = doc;
+			static TextMessage fromSource(SourceType const& doc) {
+				return TextMessage(doc);
 			}
 
 			SourceType const& getSource()const {

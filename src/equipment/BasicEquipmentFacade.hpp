@@ -1,7 +1,7 @@
 #pragma once
-#include "../interface/EquipmentInterface.hpp"
+#include "interface/EquipmentInterface.hpp"
 #include "TransportSelector.hpp"
-#include "AxisImpl.hpp"
+#include "BasicAxis.hpp"
 // std
 #include <unordered_map>
 #include <memory>
@@ -12,7 +12,7 @@ namespace strateam{
         class BasicEquipmentFacade : public EquipmentInterface{
         public:// == TYPEs ==
             using Transport = TransportSelector<Tag>::type;
-            using Axis = AxisImpl<Tag>;
+            using Axis = BasicAxis<Tag>;
             using AxisPtr = std::unique_ptr<Axis>;
             using Axises = std::unordered_map<AxisType, AxisPtr>;
 
