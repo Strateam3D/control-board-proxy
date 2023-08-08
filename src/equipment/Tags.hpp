@@ -8,22 +8,22 @@
 namespace strateam{
     namespace equipment{
         struct Usb {
-            using IsUsb = std::true_type;
+            using IsUsb = boost::mpl::true_;
         };
 
         struct Json {
-            using IsJson = std::true_type;
+            using IsJson = boost::mpl::true_;
         };
 
         struct Text {
-            using IsText = std::true_type;
+            using IsText = boost::mpl::true_;
         };
 
-        struct DlpTag{
-            using IsDlp = std::true_type;
+        struct Dlp{
+            using IsDlp = boost::mpl::true_;
         };
 
-        using UsbJsonDlpTags = boost::mpl::vector<Usb, Json, DlpTag> ;
+        using UsbJsonDlpTags = boost::mpl::vector<Usb, Json, Dlp> ;
         using UsbTextTags = boost::mpl::vector<Usb, Text>;
 
 #ifndef DEFINE_TRANSPORT_TAG
@@ -35,7 +35,7 @@ namespace strateam{
 #endif
 
         DEFINE_TRANSPORT_TAG(UsbJsonDlp)
-        DEFINE_TRANSPORT_TAG(UsbText)
+        // DEFINE_TRANSPORT_TAG(UsbText)
 
     }
 }

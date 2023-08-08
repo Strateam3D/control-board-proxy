@@ -1,6 +1,6 @@
 #pragma once
 #include "IsUsb.hpp"
-
+#include "dlp/DlpTransport.hpp"
 namespace strateam{
     namespace equipment{
         template <typename TagT>
@@ -13,7 +13,7 @@ namespace strateam{
 
         template<typename TagT>
         struct TransportSelector<TagT, std::enable_if_t< IsUsb< TagT >::value > > {
-            using type = DlpTransport<TagT>;
+            using type = dlp::DlpTransport<TagT>;
         };
     }
 }

@@ -1,6 +1,7 @@
 #pragma once
 #include "interface/AxisInterface.hpp"
 #include "TransportSelector.hpp"
+#include "AxisSelector.hpp"
 
 // boost
 #include <boost/asio.hpp>
@@ -10,11 +11,11 @@
 
 namespace strateam{
     namespace equipment{
-        template<typename Tag>
-        class BasicAxis : public AxisInterface, private AxisSelector<Tag>::type{
+        template<typename TagT>
+        class BasicAxis : public AxisInterface, protected AxisSelector<TagT>::type{
         public:// == TYPES ==
-            using Transport = TransportSelector<Tag>::type;
-            using AxisImpl = AxisSelector<Tag>::type;
+            using Transport = typename TransportSelector<TagT>::type;
+            using AxisImpl = typename AxisSelector<TagT>::type;
             using F = void(*)(MotionResult);
         public:// == ctor ==
             BasicAxis( std::size_t axisId, Transport& t ) : AxisImpl( axisId ), transport_( t ){}
@@ -24,13 +25,13 @@ namespace strateam{
         public:// == AxisInterface ==
             virtual bool isMoving() override{
                 auto response = transport_.sendRequestGetResponse( AxisImpl::isMoving() );
-                return AxisImpl::into<typename AxisImpl::Moving>( response.getSource() );
+                return AxisImpl::into<AxisImpl::Moving>( response.getSource() );
             }
 
             virtual MotionResult move( dim::MotorStep const& offset, double speed, double accel, double decel ) override{
                 f_ = &ListenerIntarface::motionDone;
                 auto response = transport_.sendRequestGetResponse( AxisImpl::move( offset, speed, accel, decel ) );
-                MotionResult motRet = AxisImpl::handleRespondCommandGo( response.getSource() );
+                MotionResult motret = AxisImpl::handleRespondCommandGo( response.getSource() );
                 handleMotionResult(motret);
                 return motret;
             }
@@ -38,7 +39,7 @@ namespace strateam{
             virtual MotionResult moveTo( dim::MotorStep const& target, double speed, double accel, double decel )override{
                 f_ = &ListenerIntarface::motionToDone;
                 auto response = transport_.sendRequestGetResponse( AxisImpl::moveTo( target, speed, accel, decel ) );
-                MotionResult motRet = AxisImpl::handleRespondCommandGo( response.getSource() );
+                MotionResult motret = AxisImpl::handleRespondCommandGo( response.getSource() );
                 handleMotionResult(motret);
                 return motret;
             }
@@ -46,7 +47,7 @@ namespace strateam{
             virtual MotionResult moveZero( double speed, double accel, double decel ) override{
                 f_ = &ListenerIntarface::moveToZeroDone;
                 auto response = transport_.sendRequestGetResponse( AxisImpl::moveZero( speed, accel, decel ) );
-                MotionResult motRet = AxisImpl::handleRespondCommandGo( response.getSource() );
+                MotionResult motret = AxisImpl::handleRespondCommandGo( response.getSource() );
                 handleMotionResult(motret);
                 return motret;
             }
@@ -62,7 +63,7 @@ namespace strateam{
 
             virtual dim::MotorStep position() override{
                 auto resp = transport_.sendRequestGetResponse( AxisImpl::position() );
-                return AxisImpl::into<dim::MotorStep>( resp.getSource() );
+                return AxisImpl::into<AxisImpl::MotorStep>( resp.getSource() );
             }
 
             virtual dim::MotorStep homePosition() override{
@@ -113,7 +114,7 @@ namespace strateam{
                                 } );
                             }
                         }else{ // 
-                            notify( f, MotionResult::Success );
+                            notify( f_, MotionResult::Success );
                         }
                     }catch(...){}
                 }else{  // if canceled, expected this is done from stop()
@@ -125,7 +126,7 @@ namespace strateam{
             Transport&                  transport_;
             boost::asio::deadline_timer isMotionDoneTimer_{ctx_};
             boost::posix_time::millisec isMotionDoneRequestPeriodMs_{300};
-            dim:::MotorStep             homePosition_{0.0};
+            dim::MotorStep             homePosition_{0.0};
             F                           f_;
 
             using time_point_milliseconds = std::chrono::time_point<std::chrono::system_clock, std::chrono::milliseconds>;

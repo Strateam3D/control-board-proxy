@@ -1,6 +1,7 @@
 #pragma once
 #include "IsDlp.hpp"
 #include "dlp/DlpAxis.hpp"
+
 namespace strateam{
     namespace equipment{
         template <typename TagT>
@@ -12,7 +13,7 @@ namespace strateam{
         };
 
         template<typename TagT>
-        struct AxisSelector<TagT, std::enable_if_t< IsDlp< TagT >::value > > {
+        struct AxisSelector<TagT, std::enable_if_t< IsDlpCheck< TagT >::value > > {
             using type = dlp::DlpAxis;
         };
     }

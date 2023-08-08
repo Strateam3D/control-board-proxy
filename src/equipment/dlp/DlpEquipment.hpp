@@ -4,7 +4,9 @@
 namespace strateam{
     namespace equipment{
         namespace dlp{
-            class DlpEquipment : public BasicEquipmentFacade<UsbJsonDlp>{};
+            struct DlpEquipment : public BasicEquipmentFacade<UsbJsonDlp>{
+                DlpEquipment( rapidjson::Value const& config ) : BasicEquipmentFacade<UsbJsonDlp>( config ){}
+            };
         }
     }
 }

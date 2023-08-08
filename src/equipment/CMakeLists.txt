@@ -1,4 +1,5 @@
 add_definitions( -DRAPIDJSON_HAS_STDSTRING=1 )
+add_definitions( -DRAPIDJSON_HAS_CXX11_RVALUE_REFS=1 )
 
 include_directories( 
     ${CMAKE_SOURCE_DIR}/3rdParty/rj/include 

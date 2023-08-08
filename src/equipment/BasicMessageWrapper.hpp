@@ -8,6 +8,7 @@
 #include <string>
 #include <memory>
 #include "Tags.hpp"
+#include "IsJson.hpp"
 
 namespace strateam{
     namespace equipment{
@@ -70,7 +71,7 @@ namespace strateam{
 				return *this;
 			}
 
-			char const* data() {
+			char const* data()const {
 				return buffer_.GetString();
 			}
 
@@ -126,6 +127,8 @@ namespace strateam{
 		};
 
         template<typename Tag>
-		class BasicMessageWrapper : public std::conditional<IsJson<Tag>::value, JsonMessageWrapper, TextMessageWrapper >::type {};
+		struct BasicMessageWrapper {
+			using type = typename std::conditional<IsJson<Tag>::value, JsonMessageWrapper, TextMessageWrapper >::type;
+		};
     }
 }

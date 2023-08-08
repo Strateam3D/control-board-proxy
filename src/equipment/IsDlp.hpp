@@ -5,9 +5,9 @@
 namespace strateam{
     namespace equipment{
         template<typename Tag, typename Enabled = void>
-        struct IsDlp : std::false_type{};
+        struct IsDlpCheck : std::false_type{};
 
         template<typename Tag> 
-        struct IsDlp<Tag, std::enable_if_t< Tag::IsDpl::value >> : std::true_type{};
+        struct IsDlpCheck<Tag, std::enable_if_t< Tag::IsDpl::value >> : std::true_type{};
     }
 }
