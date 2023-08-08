@@ -34,8 +34,8 @@ namespace strateam{
 															 boost::mpl::placeholders::_2 > >::type{};
 #endif
 
-        // DEFINE_TRANSPORT_TAG(UsbJson)
-        // DEFINE_TRANSPORT_TAG(UsbText)
+        DEFINE_TRANSPORT_TAG(UsbJsonDlp)
+        DEFINE_TRANSPORT_TAG(UsbText)
 
     }
 }

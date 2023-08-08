@@ -1,7 +1,6 @@
 #pragma once
 #include "interface/AxisInterface.hpp"
 #include "TransportSelector.hpp"
-#include "BasicMessage.hpp"
 
 // boost
 #include <boost/asio.hpp>
@@ -25,13 +24,13 @@ namespace strateam{
         public:// == AxisInterface ==
             virtual bool isMoving() override{
                 auto response = transport_.sendRequestGetResponse( AxisImpl::isMoving() );
-                return AxisImpl::isMovingResult( response );
+                return AxisImpl::into<typename AxisImpl::Moving>( response.getSource() );
             }
 
             virtual MotionResult move( dim::MotorStep const& offset, double speed, double accel, double decel ) override{
                 f_ = &ListenerIntarface::motionDone;
                 auto response = transport_.sendRequestGetResponse( AxisImpl::move( offset, speed, accel, decel ) );
-                MotionResult motRet = AxisImpl::handleRespondCommandGo( response );
+                MotionResult motRet = AxisImpl::handleRespondCommandGo( response.getSource() );
                 handleMotionResult(motret);
                 return motret;
             }
@@ -39,7 +38,7 @@ namespace strateam{
             virtual MotionResult moveTo( dim::MotorStep const& target, double speed, double accel, double decel )override{
                 f_ = &ListenerIntarface::motionToDone;
                 auto response = transport_.sendRequestGetResponse( AxisImpl::moveTo( target, speed, accel, decel ) );
-                MotionResult motRet = AxisImpl::handleRespondCommandGo( response );
+                MotionResult motRet = AxisImpl::handleRespondCommandGo( response.getSource() );
                 handleMotionResult(motret);
                 return motret;
             }
@@ -47,7 +46,7 @@ namespace strateam{
             virtual MotionResult moveZero( double speed, double accel, double decel ) override{
                 f_ = &ListenerIntarface::moveToZeroDone;
                 auto response = transport_.sendRequestGetResponse( AxisImpl::moveZero( speed, accel, decel ) );
-                MotionResult motRet = AxisImpl::handleRespondCommandGo( response );
+                MotionResult motRet = AxisImpl::handleRespondCommandGo( response.getSource() );
                 handleMotionResult(motret);
                 return motret;
             }
@@ -63,7 +62,7 @@ namespace strateam{
 
             virtual dim::MotorStep position() override{
                 auto resp = transport_.sendRequestGetResponse( AxisImpl::position() );
-                return AxisImpl::positionResult( resp );
+                return AxisImpl::into<dim::MotorStep>( resp.getSource() );
             }
 
             virtual dim::MotorStep homePosition() override{
@@ -85,7 +84,6 @@ namespace strateam{
                     this->isMotionDonePeriodicalCallback( err ); 
                 } );
             }
-
 
             void handleMotionResult( MotionResult result ){
                 if( result ){

@@ -5,8 +5,10 @@
 
 #include "eq-common/Dimensions.hpp"
 #include "MotionResult.hpp"
+#include "../EqException.hpp"
 
 #include <string>
+#include <iostream>
 #include <stdexcept>
 
 namespace strateam{
@@ -22,17 +24,28 @@ namespace strateam{
                 static constexpr dim::MotorStep InvalidPositionMin = dim::MotorStep{ std::numeric_limits<int>::min()};
                 static constexpr dim::MotorStep InvalidPositionMax = dim::MotorStep{ std::numeric_limits<int>::max()};
                 static constexpr dim::MotorStep InvalidPosition = InvalidPositionMin;
+
+            public:
+                struct Moving{
+                    bool val{false};
+
+                    operator bool(){ return val; }
+                };
             
             public:// == DlpAxis ==
                 DlpAxis( std::size_t axisId ) : axisId_( axisId ), axisName_( "/motor" + std::to_string( axisId ) ){}
 
-                rapidjson::Document isMoving(){
+                template<typename T>
+                T into( rj::Document& doc );
+
+
+                rapidjson::Document&& isMoving(){
                     static rj::Pointer p( axisName_.append( "/go" ).c_str() );
                     static rj::Pointer pos( axisName_.append("/pos").c_str() );
                     rapidjson::Document req(rj::kObjectType);
                     rj::SetValueByPointer( req, p, rj::kNullType );
                     rj::SetValueByPointer( req, pos, rj::kNullType );
-                    return req;
+                    return std::move( req );
                 }
 
                 bool isMovingResult( rj::Document const& doc ){
@@ -45,7 +58,7 @@ namespace strateam{
                     return val->GetBool();
                 }
 
-                rj::Document move( dim::MotorStep const& offset, double speed, double accel, double decel ){
+                rj::Document&& move( dim::MotorStep const& offset, double speed, double accel, double decel ){
                     fixSpeedAccelDecel( speed,accel,decel );
                     rapidjson::Document req(rj::kObjectType);
                     auto& alloc = req.GetAllocator();
@@ -58,15 +71,31 @@ namespace strateam{
                     params.AddMember("decel", decel, alloc);  //Q_UNUSED(decel);//
                     params.AddMember("go", true, alloc);
                     req.AddMember( rj::Value( axisName_, alloc ), params );
-                    return req;
+                    return std::move( req );
                 }
 
                 MotionResult handleRespondCommandGo( rj::Document const& doc ){
                     auto const* val = rj::GetValueByPointer( doc, rj::Pointer( axisName_.append( "/go" ).c_str() ) );
-                    return val && val->IsBool() && val->GetBool() ? MotionResult::Accepted : MotionResult::FAILED;
+
+                    if( !val ){
+                        throw Exception( "Invalid go response" );
+                    }
+
+                    if( val->IsString() ){
+                        std::string rsp = val->GetString();
+
+                        if( rsp.find( "Already in the targetPosition" ) != std::string::npos ){
+                            return MotionResult::AlreadyInPosition;
+                        }else{
+                            std::cout << __func__ << "ERR: " << rsp << std::endl;
+                            return MotionResult::FAILED;
+                        }
+                    }
+
+                    return val->GetBool() ? MotionResult::Accepted : MotionResult::FAILED;
                 }
 
-                rj::Document moveTo( dim::MotorStep const& target, double speed, double accel, double decel ){
+                rj::Document&& moveTo( dim::MotorStep const& target, double speed, double accel, double decel ){
                     fixSpeedAccelDecel( speed,accel,decel );
                     rapidjson::Document req(rj::kObjectType);
                     auto& alloc = req.GetAllocator();
@@ -78,10 +107,10 @@ namespace strateam{
                     params.AddMember("decel", decel, alloc);  //Q_UNUSED(decel);//
                     params.AddMember("go", true, alloc);
                     req.AddMember( rj::Value( axisName_, alloc ), params );
-                    return req;
+                    return std::move( req );
                 }
 
-                rj::Document moveZero( double speed, double accel, double decel ){
+                rj::Document&& moveZero( double speed, double accel, double decel ){
                     fixSpeedAccelDecel( speed,accel,decel );
                     rapidjson::Document req(rj::kObjectType);
                     auto& al = req.GetAllocator();
@@ -92,14 +121,14 @@ namespace strateam{
                     params.AddMember("goZero",true,al);
                     params.AddMember("go",rj::kNullType,al);
                     req.AddMember( rj::Value( axisName_, al ) );
-                    return req;
+                    return std::move( req );
                 }
 
-                rj::Document  stop(){
+                rj::Document&& stop(){
                     rj::Document req;
                     rj::SetValueByPointer( req, rj::Pointer( axisName_.append( "/go" ).c_str() ), false );
                     rj::SetValueByPointer( req, rj::Pointer( axisName_.append( "/pos" ).c_str() ), rj::kNullType );
-                    return req;
+                    return std::move( req );
                 }
 
                 rj::Document position(){
@@ -127,6 +156,28 @@ namespace strateam{
                 unsigned short microstep_{DefaultMicroStep};
                 std::string axisName_;
             };
+
+            template<>
+            DlpAxis::Moving DlpAxis::into( rj::Document& doc ){
+                auto const* val = rj::GetValueByPointer( doc, rj::Pointer( axisName_.append( "/go" ).c_str() ) );
+
+                if( !val || !val->IsBool() ){
+                    throw Exception("Wrong isMoving response");
+                }
+
+                return Moving{ val->GetBool() };
+            }
+
+            template<>
+            dim::MotorStep DlpAxis::into( rj::Document& doc ){
+                auto const* val = rj::GetValueByPointer( doc, rj::Pointer( axisName_.append( "/pos" ).c_str() ) );
+
+                if( !val || !val->IsInt() ){
+                    throw Exception("Wrong position response");
+                }
+
+                return dim::MotorStep{  val->GetInt() };
+            }
         }// namespace dlp
     }// namespace equipment
 }// namespace strateam

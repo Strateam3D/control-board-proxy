@@ -13,7 +13,7 @@ namespace strateam{
 
         template<typename TagT>
         struct TransportSelector<TagT, std::enable_if_t< IsUsb< TagT >::value > > {
-            using type = UsbSerialPortTransport<TagT>;
+            using type = DlpTransport<TagT>;
         };
     }
 }

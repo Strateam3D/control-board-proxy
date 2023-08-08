@@ -8,6 +8,6 @@ namespace strateam{
         struct IsJson : std::false_type{};
 
         template<typename Tag >
-        struct IsJson<Tag, std::enable_if_t< Tag::IsJson::value> : std::true_type{};
+        struct IsJson<Tag, std::enable_if_t< Tag::IsJson::value>> : std::true_type{};
     }
 }
