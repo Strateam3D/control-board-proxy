@@ -31,7 +31,7 @@ namespace strateam{
         public:// == EquipmentInterafce ==
             virtual AxisInterface& axis( AxisType axis ) override{
                 if( !axises_.count( axis ) ) throw Exception( "Invalid axis requested" );
-                return axises_[ axis ];
+                return *axises_[ axis ];
             }
 
         private:

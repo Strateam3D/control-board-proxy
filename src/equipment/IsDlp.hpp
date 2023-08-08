@@ -8,6 +8,6 @@ namespace strateam{
         struct IsDlpCheck : std::false_type{};
 
         template<typename Tag> 
-        struct IsDlpCheck<Tag, std::enable_if_t< Tag::IsDpl::value >> : std::true_type{};
+        struct IsDlpCheck<Tag, std::enable_if_t< Tag::IsDlpBoard::value >> : std::true_type{};
     }
 }

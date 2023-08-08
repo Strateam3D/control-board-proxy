@@ -19,12 +19,12 @@ namespace strateam{
             using IsText = boost::mpl::true_;
         };
 
-        struct Dlp{
-            using IsDlp = boost::mpl::true_;
+        struct DlpBoard{
+            using IsDlpBoard = boost::mpl::true_;
         };
 
-        using UsbJsonDlpTags = boost::mpl::vector<Usb, Json, Dlp> ;
-        using UsbTextTags = boost::mpl::vector<Usb, Text>;
+        using UsbJsonDlpTags = boost::mpl::vector<Usb, Json, DlpBoard> ;
+        // using UsbTextTags = boost::mpl::vector<Usb, Text>;
 
 #ifndef DEFINE_TRANSPORT_TAG
 #define DEFINE_TRANSPORT_TAG(name)																				\

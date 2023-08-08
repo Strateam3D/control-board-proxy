@@ -63,6 +63,8 @@ namespace strateam{
                     
                     if( cv_.wait_for( _, std::chrono::milliseconds( 5000 ) ) == std::cv_status::no_timeout ){
                         return MessageWrapper::fromData( ba_.data() ).decode();
+                    }else{
+                        std::cout << "Timeout for request " << msg.data() << std::endl;
                     }
 
                     return MessageWrapper();

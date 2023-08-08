@@ -16,7 +16,7 @@ namespace strateam{
         public:// == TYPES ==
             using Transport = typename TransportSelector<TagT>::type;
             using AxisImpl = typename AxisSelector<TagT>::type;
-            using F = void(*)(MotionResult);
+            using F = std::function<void(MotionResult)>;
         public:// == ctor ==
             BasicAxis( std::size_t axisId, Transport& t ) : AxisImpl( axisId ), transport_( t ){}
             BasicAxis( AxisImpl const& ) = delete;
@@ -25,11 +25,11 @@ namespace strateam{
         public:// == AxisInterface ==
             virtual bool isMoving() override{
                 auto response = transport_.sendRequestGetResponse( AxisImpl::isMoving() );
-                return AxisImpl::into<AxisImpl::Moving>( response.getSource() );
+                return AxisImpl::template into<typename AxisImpl::Moving>( response.getSource() );
             }
 
             virtual MotionResult move( dim::MotorStep const& offset, double speed, double accel, double decel ) override{
-                f_ = &ListenerIntarface::motionDone;
+                f_ = [this]( MotionResult ret ){ notify( &ListenerIntarface::motionDone, ret ); };
                 auto response = transport_.sendRequestGetResponse( AxisImpl::move( offset, speed, accel, decel ) );
                 MotionResult motret = AxisImpl::handleRespondCommandGo( response.getSource() );
                 handleMotionResult(motret);
@@ -37,7 +37,8 @@ namespace strateam{
             }
 
             virtual MotionResult moveTo( dim::MotorStep const& target, double speed, double accel, double decel )override{
-                f_ = &ListenerIntarface::motionToDone;
+                // f_ = ListenerIntarface::motionToDone;
+                f_ = [this]( MotionResult ret ){ notify( &ListenerIntarface::motionDone, ret ); };
                 auto response = transport_.sendRequestGetResponse( AxisImpl::moveTo( target, speed, accel, decel ) );
                 MotionResult motret = AxisImpl::handleRespondCommandGo( response.getSource() );
                 handleMotionResult(motret);
@@ -45,7 +46,8 @@ namespace strateam{
             }
 
             virtual MotionResult moveZero( double speed, double accel, double decel ) override{
-                f_ = &ListenerIntarface::moveToZeroDone;
+                // f_ = ListenerIntarface::moveToZeroDone;
+                f_ = [this]( MotionResult ret ){ notify( &ListenerIntarface::moveToZeroDone, ret ); };
                 auto response = transport_.sendRequestGetResponse( AxisImpl::moveZero( speed, accel, decel ) );
                 MotionResult motret = AxisImpl::handleRespondCommandGo( response.getSource() );
                 handleMotionResult(motret);
@@ -63,7 +65,7 @@ namespace strateam{
 
             virtual dim::MotorStep position() override{
                 auto resp = transport_.sendRequestGetResponse( AxisImpl::position() );
-                return AxisImpl::into<AxisImpl::MotorStep>( resp.getSource() );
+                return AxisImpl::template into<typename AxisImpl::MotorStep>( resp.getSource() );
             }
 
             virtual dim::MotorStep homePosition() override{
@@ -106,7 +108,7 @@ namespace strateam{
                                     stop();
                                 }catch(...){}
                                 
-                                notify( f_, MotionResult::Timeout );
+                                f_(MotionResult::Timeout);
                             }else{  // continue requesting
                                 isMotionDoneTimer_.expires_from_now( isMotionDoneRequestPeriodMs_ );
                                 isMotionDoneTimer_.async_wait( [this]( error_code err ){ 
@@ -114,11 +116,11 @@ namespace strateam{
                                 } );
                             }
                         }else{ // 
-                            notify( f_, MotionResult::Success );
+                             f_( MotionResult::Success );
                         }
                     }catch(...){}
                 }else{  // if canceled, expected this is done from stop()
-                    notify( f_, MotionResult::Stopped );
+                    f_( MotionResult::Stopped );
                 }
             }
         private:

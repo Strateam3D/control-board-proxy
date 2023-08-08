@@ -1,7 +1,6 @@
 add_compile_options(-Wall -Wextra )
 set(cb_src)
 
-add_subdirectory(eq-common)
 
 include_directories( 
     ${CMAKE_SOURCE_DIR}  
@@ -59,3 +58,6 @@ add_dependencies(${CONTROL_BOARD_TARGET}
     paho-mqttpp3
     mqttStack
 )
+
+add_subdirectory(eq-common)
+add_subdirectory(equipment)

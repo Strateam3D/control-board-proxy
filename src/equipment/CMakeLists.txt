@@ -18,7 +18,7 @@ target_sources( ${CONTROL_BOARD_TARGET} PUBLIC
     TransportSelector.hpp
     
     dlp/DlpAxis.hpp
-    dlp/Equipment.hpp
+    dlp/DlpEquipment.hpp
     dlp/DlpTransport.hpp
 
     interface/AxisInterface.hpp
@@ -26,7 +26,14 @@ target_sources( ${CONTROL_BOARD_TARGET} PUBLIC
     interface/Listenable.hpp
     interface/ListenerInterface.hpp
     interface/MotionResult.hpp
-
-    serial_port/AsyncSerialPort.cpp
     serial_port/AsyncSerialPort.hpp
+PRIVATE
+    serial_port/AsyncSerialPort.cpp
+    
+)
+
+
+target_include_directories(${CONTROL_BOARD_TARGET} 
+PUBLIC 
+    ${CMAKE_CURRENT_SOURCE_DIR}
 )
