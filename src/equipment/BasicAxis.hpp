@@ -12,7 +12,7 @@
 namespace strateam{
     namespace equipment{
         template<typename TagT>
-        class BasicAxis : public AxisInterface, protected AxisSelector<TagT>::type{
+        class BasicAxis : public AxisInterface, private AxisSelector<TagT>::type{
         public:// == TYPES ==
             using Transport = typename TransportSelector<TagT>::type;
             using AxisImpl = typename AxisSelector<TagT>::type;
@@ -32,6 +32,7 @@ namespace strateam{
                 f_ = [this]( MotionResult ret ){ notify( &ListenerIntarface::motionDone, ret ); };
                 auto response = transport_.sendRequestGetResponse( AxisImpl::move( offset, speed, accel, decel ) );
                 MotionResult motret = AxisImpl::handleRespondCommandGo( response.getSource() );
+                std::cout << "ret: " << motret.str() << std::endl;
                 handleMotionResult(motret);
                 return motret;
             }
@@ -90,17 +91,24 @@ namespace strateam{
 
             void handleMotionResult( MotionResult result ){
                 if( result ){
+                    std::cout << "22222 result: " << result.str() << std::endl;
                     if( result == MotionResult::Success || result == MotionResult::Accepted)
                         startPeriodicalRequestMotionIsDone();
+                }else{
+                    std::cout << "olololo: " << result.str() << std::endl;
                 }
             }
 
             void isMotionDonePeriodicalCallback( boost::system::error_code err ){
+                std::cout << __func__ << std::endl;
                 using boost::system::error_code;
                 
                 if(!err){
                     try{
-                        if( isMoving() ){  
+                        auto retval = isMoving();
+                        std::cout << "retval: " << retval << std::endl;
+
+                        if( retval ){  
                             auto waitingForMotionDoneDuration = std::chrono::system_clock::now() - beginWaitingTimePoint_;
                             
                             if( waitingForMotionDoneDuration > waitForMotionDoneMaxDuration_ ){
@@ -115,10 +123,12 @@ namespace strateam{
                                     this->isMotionDonePeriodicalCallback( err ); 
                                 } );
                             }
-                        }else{ // 
-                             f_( MotionResult::Success );
+                        }else{ //
+                            f_( MotionResult::Success );
                         }
-                    }catch(...){}
+                    }catch(std::exception const& ex){
+                        std::cout << "poll err: " << ex.what() << std::endl;
+                    }
                 }else{  // if canceled, expected this is done from stop()
                     f_( MotionResult::Stopped );
                 }

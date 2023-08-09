@@ -54,6 +54,7 @@ rj::Document DocumentFromString( const char* str ){
 int main(){
     rapidjson::Document doc = DocumentFromString( DefaultCfg );
     boost::asio::io_context ctx;
+    std::shared_ptr<boost::asio::io_context::work> w = std::make_shared< boost::asio::io_context::work >( ctx );
     strateam::equipment::dlp::DlpEquipment eq( ctx, doc );
     
     std::thread thrd( [&ctx](){
@@ -71,19 +72,20 @@ int main(){
             std::cout << "motor1 resp: "  << rval.str() << std::endl;
             std::this_thread::sleep_for( 6s );
 
-            auto& motor2 = eq.axis( AxisType::Y );
-            rval = motor2.move( strateam::dim::MotorStep( -5000 ), 1000, 1600, 1600 );
-            assert( rval );
-            std::cout << "motor2 resp: "  << rval.str() << std::endl;
-            std::this_thread::sleep_for( 6s );
+            // auto& motor2 = eq.axis( AxisType::Y );
+            // rval = motor2.move( strateam::dim::MotorStep( -5000 ), 1000, 1600, 1600 );
+            // assert( rval );
+            // std::cout << "motor2 resp: "  << rval.str() << std::endl;
+            // std::this_thread::sleep_for( 6s );
 
-            auto& motor3 = eq.axis( AxisType::Z );
-            rval = motor3.move( strateam::dim::MotorStep( -5000 ), 1000, 1600, 1600 );
-            assert( rval );
-            std::cout << "motor3 resp: "  << rval.str() << std::endl;
-            std::this_thread::sleep_for( 6s );
+            // auto& motor3 = eq.axis( AxisType::Z );
+            // rval = motor3.move( strateam::dim::MotorStep( -5000 ), 1000, 1600, 1600 );
+            // assert( rval );
+            // std::cout << "motor3 resp: "  << rval.str() << std::endl;
+            // std::this_thread::sleep_for( 6s );
 
             std::cout << "shutdown" << std::endl;
+            w.reset();
     }catch( std::exception const& ex ){
         std::cout << "move err: " << ex.what() << std::endl;
     }

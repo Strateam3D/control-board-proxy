@@ -19,8 +19,8 @@ namespace strateam{
         protected:
             template<typename F, typename... Args>
             void notify(F&& func, Args&&... args){
-                assert(listener_);
-                std::invoke( std::forward<F>(func), listener_, std::forward<Args>(args)... );
+                if(listener_)
+                    std::invoke( std::forward<F>(func), listener_, std::forward<Args>(args)... );
             }
         };
         

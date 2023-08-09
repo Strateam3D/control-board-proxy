@@ -44,16 +44,18 @@ namespace strateam{
 
 
                 rapidjson::Document isMoving(){
-                    static rj::Pointer p( pointerName_.append( "/go" ).c_str() );
-                    static rj::Pointer pos( pointerName_.append("/pos").c_str() );
-                    rapidjson::Document req(rj::kObjectType);
+                    static rj::Pointer p( (pointerName_ + "/go") .c_str() );
+                    // std::cout << "pointerName_1: " << pointerName_ << std::endl;
+                    static rj::Pointer pos( ( pointerName_ + "/pos").c_str() );
+                    // std::cout << "pointerName_2: " << pointerName_ << std::endl;
+                    rapidjson::Document req;
                     rj::SetValueByPointer( req, p, rj::kNullType );
                     rj::SetValueByPointer( req, pos, rj::kNullType );
                     return req;
                 }
 
                 bool isMovingResult( rj::Document const& doc ){
-                    static rj::Pointer p( pointerName_.append( "/go" ).c_str());
+                    static rj::Pointer p( ( pointerName_ + "/go" ).c_str());
                     auto const* val = rj::GetValueByPointer( doc, p );
 
                     if( !val || !val->IsBool() )
@@ -79,7 +81,7 @@ namespace strateam{
                 }
 
                 MotionResult handleRespondCommandGo( rj::Document const& doc ){
-                    auto const* val = rj::GetValueByPointer( doc, rj::Pointer( pointerName_.append( "/go" ).c_str() ) );
+                    auto const* val = rj::GetValueByPointer( doc, rj::Pointer( ( pointerName_ + "/go" ).c_str() ) );
 
                     if( !val ){
                         throw Exception( "Invalid go response" );
@@ -130,19 +132,19 @@ namespace strateam{
 
                 rj::Document stop(){
                     rj::Document req;
-                    rj::SetValueByPointer( req, rj::Pointer( pointerName_.append( "/go" ).c_str() ), false );
-                    rj::SetValueByPointer( req, rj::Pointer( pointerName_.append( "/pos" ).c_str() ), rj::kNullType );
+                    rj::SetValueByPointer( req, rj::Pointer( ( pointerName_ + "/go" ).c_str() ), false );
+                    rj::SetValueByPointer( req, rj::Pointer( ( pointerName_ + "/pos" ).c_str() ), rj::kNullType );
                     return req;
                 }
 
                 rj::Document position(){
                     rj::Document req;
-                    rj::SetValueByPointer( req, rj::Pointer( pointerName_.append( "/pos" ).c_str() ), rj::kNullType );
+                    rj::SetValueByPointer( req, rj::Pointer( ( pointerName_ +  "/pos" ).c_str() ), rj::kNullType );
                     return req;
                 }
 
                 dim::MotorStep positionResult( rj::Document const& doc ){
-                    auto const* val = rj::GetValueByPointer( doc, rj::Pointer( pointerName_.append( "/pos" ).c_str() ) );
+                    auto const* val = rj::GetValueByPointer( doc, rj::Pointer( ( pointerName_ + "/pos" ).c_str() ) );
                     return val && val->IsInt() ? dim::MotorStep( val->GetInt() ) : InvalidPosition;
                 }
             private:
@@ -164,7 +166,7 @@ namespace strateam{
 
             template<>
             DlpAxis::Moving DlpAxis::into( rj::Document const& doc ){
-                auto const* val = rj::GetValueByPointer( doc, rj::Pointer( axisName_.append( "/go" ).c_str() ) );
+                auto const* val = rj::GetValueByPointer( doc, rj::Pointer( ( pointerName_ + "/go" ).c_str() ) );
 
                 if( !val || !val->IsBool() ){
                     throw Exception("Wrong isMoving response");
@@ -175,7 +177,7 @@ namespace strateam{
 
             template<>
             dim::MotorStep DlpAxis::into( rj::Document const& doc ){
-                auto const* val = rj::GetValueByPointer( doc, rj::Pointer( axisName_.append( "/pos" ).c_str() ) );
+                auto const* val = rj::GetValueByPointer( doc, rj::Pointer( ( pointerName_ + "/pos" ).c_str() ) );
 
                 if( !val || !val->IsInt() ){
                     throw Exception("Wrong position response");
