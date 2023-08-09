@@ -14,6 +14,12 @@ namespace strateam{
     namespace equipment{
         namespace rj = rapidjson;
 
+		constexpr unsigned kParseRelaxedFLAGS =
+		rj::kParseNanAndInfFlag 
+		| rj::kParseCommentsFlag 
+		| rj::kParseTrailingCommasFlag 
+		| rj::kParseStopWhenDoneFlag;   // rj::kParseInsituFlag | rj::kParseNumbersAsStringsFlag |
+
 		class JsonMessageWrapper {
 			std::shared_ptr<rj::Document>		documentPtr_;
 			rj::StringBuffer	buffer_;
@@ -30,7 +36,8 @@ namespace strateam{
 
 			JsonMessageWrapper( const char* rawInput )
 			: documentPtr_(std::make_shared<rj::Document>()){
-				documentPtr_->Parse(rawInput);
+				documentPtr_->Parse<kParseRelaxedFLAGS>(rawInput);
+				assert( !documentPtr_->HasParseError() && __func__ );
 			}
 
 			JsonMessageWrapper( JsonMessageWrapper const& rhs )
@@ -55,7 +62,7 @@ namespace strateam{
 			}
 
 			JsonMessageWrapper& encode(){
-				rj::PrettyWriter<rj::StringBuffer, rj::UTF8<>, rj::UTF8<>, rj::CrtAllocator, rj::kWriteNanAndInfFlag> writer(buffer_);
+				rj::Writer<rj::StringBuffer> writer( buffer_ );
 				documentPtr_->Accept(writer);
 				return *this;
 			}

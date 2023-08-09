@@ -8,9 +8,10 @@
                     "${workspaceFolder}/3rdParty/rj/include"
                 ],
                 "limitSymbolsToIncludedHeaders": true
-             },
+            },
             "includePath": [
                 "${workspaceFolder}/**",
+                "${workspaceFolder}/3rdParty/rj/include",
                 "${workspaceFolder}/3rdParty/rj/include"
             ],
             "defines": [],

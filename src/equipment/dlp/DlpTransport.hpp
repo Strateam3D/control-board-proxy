@@ -32,9 +32,9 @@ namespace strateam{
                 : deviceName_( "/dev/ttyACM0" ){
                     setConfig(config);
                     openConnection();
-                    std::unique_lock<std::mutex> _( mtx_ );
-                    readAll();
-                    sendRawRequestGetResponse( MessageWrapper::fromData( "ncd-json  /info \n" ).encode() );
+                    // std::unique_lock<std::mutex> _( mtx_ );
+                    // readAll();
+                    sendRawRequestGetResponse( MessageWrapper::fromData( "{\"info\" : null}" ).encode() );
                 }
 
                 DlpTransport( DlpTransport const& ) = delete;
@@ -53,16 +53,21 @@ namespace strateam{
             private:
                 
                 MessageWrapper sendRawRequestGetResponse( MessageWrapper const& msg ){
-                    static constexpr char const* prefix = "ncd-json  ";
-                    static constexpr char const* suffix = "\n";
-                    std::vector<char> ba(prefix, prefix + sizeof( prefix ));
+                    static std::string const prefix = "ncd-json '";
+                    std::cout << "pref: " << prefix.size() << std::endl;
+                    static std::string const suffix = "'\n";
+                    std::vector<char> ba(prefix.begin(), prefix.end());
                     ba.insert( ba.end(),  msg.data(), msg.data() + msg.size() );
-                    ba.insert( ba.end(), suffix, suffix + sizeof( suffix ) );
+                    ba.insert( ba.end(), suffix.begin(), suffix.end() );
+                    std::cout << "request: "<< ba.data() << std::endl;  // change the copy of req.
                     std::unique_lock<std::mutex> _( mtx_ );
                     serialPort_.write( ba );
                     
                     if( cv_.wait_for( _, std::chrono::milliseconds( 5000 ) ) == std::cv_status::no_timeout ){
-                        return MessageWrapper::fromData( ba_.data() ).decode();
+                        auto resp = std::move( ba_ );
+                        assert( ba_.empty() );
+                        std::cout << "response: " << (resp.empty() ? "EMPTY" : resp.data() ) << std::endl;
+                        return MessageWrapper::fromData( resp.data() ).decode();
                     }else{
                         std::cout << "Timeout for request " << msg.data() << std::endl;
                     }
@@ -106,7 +111,6 @@ namespace strateam{
                     std::unique_lock<std::mutex>_( mtx_ );
                     ba_.insert( ba_.end(), data, data + len );               
                     bool promtInvitationFound = findResponseTerminatorAndChop( ba_ );
-                    std::cout << "response: " << (ba_.empty() ? "EMPTY" : ba_.data() ) << ", promtInvitationFound: " << promtInvitationFound << std::endl;
                     
                     if( promtInvitationFound ){
                         cv_.notify_one();
@@ -142,7 +146,9 @@ namespace strateam{
                     std::unique_lock<std::mutex> _( mtx_ );
                     
                     if( cv_.wait_for( _, std::chrono::milliseconds( 5000 ) ) == std::cv_status::no_timeout ){
-                        std::cout << __func__ << std::string( ba_.data(), ba_.size() ) << std::endl;
+                        auto resp = std::move( ba_ );
+                        assert( ba_.empty() );
+                        std::cout << __func__ << resp.data() << std::endl;
                     }else{
                         std::cout << "Failed to read invitation" << std::endl;
                     }
