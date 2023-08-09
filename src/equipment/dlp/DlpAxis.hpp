@@ -31,23 +31,21 @@ namespace strateam{
 
                     operator bool(){ return val; }
                 };
-
-                struct MotorStep{
-                    dim::MotorStep val{0.0};
-
-                    operator dim::MotorStep(){ return val; }
-                };
             
             public:// == DlpAxis ==
-                DlpAxis( std::size_t axisId ) : axisId_( axisId ), axisName_( "/motor" + std::to_string( axisId ) ){}
+                DlpAxis( std::size_t axisId ) 
+                : axisId_( axisId + 1 )
+                , axisName_( "motor" + std::to_string( axisId_ ) )
+                , pointerName_( "/motor" + std::to_string( axisId_ ) )
+                {}
 
                 template<typename T>
                 T into( rj::Document const& doc );
 
 
                 rapidjson::Document isMoving(){
-                    static rj::Pointer p( axisName_.append( "/go" ).c_str() );
-                    static rj::Pointer pos( axisName_.append("/pos").c_str() );
+                    static rj::Pointer p( pointerName_.append( "/go" ).c_str() );
+                    static rj::Pointer pos( pointerName_.append("/pos").c_str() );
                     rapidjson::Document req(rj::kObjectType);
                     rj::SetValueByPointer( req, p, rj::kNullType );
                     rj::SetValueByPointer( req, pos, rj::kNullType );
@@ -55,7 +53,7 @@ namespace strateam{
                 }
 
                 bool isMovingResult( rj::Document const& doc ){
-                    static rj::Pointer p( axisName_.append( "/go" ).c_str());
+                    static rj::Pointer p( pointerName_.append( "/go" ).c_str());
                     auto const* val = rj::GetValueByPointer( doc, p );
 
                     if( !val || !val->IsBool() )
@@ -81,7 +79,7 @@ namespace strateam{
                 }
 
                 MotionResult handleRespondCommandGo( rj::Document const& doc ){
-                    auto const* val = rj::GetValueByPointer( doc, rj::Pointer( axisName_.append( "/go" ).c_str() ) );
+                    auto const* val = rj::GetValueByPointer( doc, rj::Pointer( pointerName_.append( "/go" ).c_str() ) );
 
                     if( !val ){
                         throw Exception( "Invalid go response" );
@@ -132,19 +130,19 @@ namespace strateam{
 
                 rj::Document stop(){
                     rj::Document req;
-                    rj::SetValueByPointer( req, rj::Pointer( axisName_.append( "/go" ).c_str() ), false );
-                    rj::SetValueByPointer( req, rj::Pointer( axisName_.append( "/pos" ).c_str() ), rj::kNullType );
+                    rj::SetValueByPointer( req, rj::Pointer( pointerName_.append( "/go" ).c_str() ), false );
+                    rj::SetValueByPointer( req, rj::Pointer( pointerName_.append( "/pos" ).c_str() ), rj::kNullType );
                     return req;
                 }
 
                 rj::Document position(){
                     rj::Document req;
-                    rj::SetValueByPointer( req, rj::Pointer( axisName_.append( "/pos" ).c_str() ), rj::kNullType );
+                    rj::SetValueByPointer( req, rj::Pointer( pointerName_.append( "/pos" ).c_str() ), rj::kNullType );
                     return req;
                 }
 
                 dim::MotorStep positionResult( rj::Document const& doc ){
-                    auto const* val = rj::GetValueByPointer( doc, rj::Pointer( axisName_.append( "/pos" ).c_str() ) );
+                    auto const* val = rj::GetValueByPointer( doc, rj::Pointer( pointerName_.append( "/pos" ).c_str() ) );
                     return val && val->IsInt() ? dim::MotorStep( val->GetInt() ) : InvalidPosition;
                 }
             private:
@@ -161,6 +159,7 @@ namespace strateam{
                 std::size_t axisId_;
                 unsigned short microstep_{DefaultMicroStep};
                 std::string axisName_;
+                std::string pointerName_;
             };
 
             template<>
@@ -175,14 +174,14 @@ namespace strateam{
             }
 
             template<>
-            DlpAxis::MotorStep DlpAxis::into( rj::Document const& doc ){
+            dim::MotorStep DlpAxis::into( rj::Document const& doc ){
                 auto const* val = rj::GetValueByPointer( doc, rj::Pointer( axisName_.append( "/pos" ).c_str() ) );
 
                 if( !val || !val->IsInt() ){
                     throw Exception("Wrong position response");
                 }
 
-                return MotorStep{ dim::MotorStep{  static_cast<double>(val->GetInt()) } };
+                return dim::MotorStep{  static_cast<double>(val->GetInt()) };
             }
         }// namespace dlp
     }// namespace equipment

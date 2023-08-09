@@ -40,6 +40,7 @@ namespace strateam{
         const char* str() const {
             switch( reason_ ){
                 case Success:            return "Success";
+                case Accepted:           return "Accepted";
                 case AlreadyInPosition:  return "Already In Position";
                 case AlreadyMoving:      return "Already Moving";
                 case Interrupted:        return "Interrupted";

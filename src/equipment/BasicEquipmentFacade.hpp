@@ -22,10 +22,27 @@ namespace strateam{
             using Axises = std::unordered_map<AxisType, AxisPtr>;
 
         public:
-            BasicEquipmentFacade( rapidjson::Value const& config )
-            : transport_( sureConfig( config, rj::Pointer("/controlBoard") ) )
-            {
-                //TODO: create axises
+            BasicEquipmentFacade( boost::asio::io_context& ctx, rapidjson::Value const& config )
+            : transport_( sureConfig( config, rj::Pointer("/controlBoard") ) ){
+                auto const* val = rj::GetValueByPointer( config, "/equipment/axises" );
+
+                if( !val || !val->IsArray() ){
+                    throw Exception( "Invalid configuration" );
+                }
+
+                
+                auto const& axises = config["equipment"]["axises"].GetArray();
+                std::size_t id = 0;
+
+                for( rj::Value::ConstValueIterator it = axises.Begin(); it != axises.End(); it++, id ++ ){
+                    const rj::Value::ConstObject& axisValue = it->GetObject();
+                    std::string axisName = axisValue[ "name" ].GetString();
+                    std::cout << "Creating axis " << axisName << std::endl;
+                    AxisPtr axisPtr = std::make_unique<Axis>( ctx, id, transport_ );
+                    int hp = axisValue[ "homePos" ].GetInt();
+                    axisPtr->setHomePosition( dim::MotorStep( hp ) );
+                    axises_.emplace( static_cast<AxisType>( id ), std::move( axisPtr ) );
+                }
             }
 
         public:// == EquipmentInterafce ==

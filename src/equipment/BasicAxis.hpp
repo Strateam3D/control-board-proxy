@@ -18,7 +18,7 @@ namespace strateam{
             using AxisImpl = typename AxisSelector<TagT>::type;
             using F = std::function<void(MotionResult)>;
         public:// == ctor ==
-            BasicAxis( std::size_t axisId, Transport& t ) : AxisImpl( axisId ), transport_( t ){}
+            BasicAxis( boost::asio::io_context& ctx, std::size_t axisId, Transport& t ) : AxisImpl( axisId ), ctx_( ctx ), transport_( t ){}
             BasicAxis( AxisImpl const& ) = delete;
             BasicAxis& operator =( BasicAxis const& ) = delete;
 
@@ -65,7 +65,7 @@ namespace strateam{
 
             virtual dim::MotorStep position() override{
                 auto resp = transport_.sendRequestGetResponse( AxisImpl::position() );
-                return AxisImpl::template into<typename AxisImpl::MotorStep>( resp.getSource() );
+                return AxisImpl::template into<dim::MotorStep>( resp.getSource() );
             }
 
             virtual dim::MotorStep homePosition() override{

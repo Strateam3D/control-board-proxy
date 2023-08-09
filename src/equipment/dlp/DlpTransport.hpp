@@ -32,8 +32,7 @@ namespace strateam{
                 : deviceName_( "/dev/ttyACM0" ){
                     setConfig(config);
                     openConnection();
-                    // std::unique_lock<std::mutex> _( mtx_ );
-                    // readAll();
+                    readAll();
                     sendRawRequestGetResponse( MessageWrapper::fromData( "{\"info\" : null}" ).encode() );
                 }
 
@@ -51,15 +50,19 @@ namespace strateam{
                 }
 
             private:
-                
                 MessageWrapper sendRawRequestGetResponse( MessageWrapper const& msg ){
                     static std::string const prefix = "ncd-json '";
-                    std::cout << "pref: " << prefix.size() << std::endl;
                     static std::string const suffix = "'\n";
+
                     std::vector<char> ba(prefix.begin(), prefix.end());
                     ba.insert( ba.end(),  msg.data(), msg.data() + msg.size() );
                     ba.insert( ba.end(), suffix.begin(), suffix.end() );
-                    std::cout << "request: "<< ba.data() << std::endl;  // change the copy of req.
+                    std::cout << "request: "<< ba.data() << std::endl;
+                    
+                    return sendRawRequestGetResponse( ba );;
+                }
+
+                MessageWrapper sendRawRequestGetResponse( ByteArray const& ba ){
                     std::unique_lock<std::mutex> _( mtx_ );
                     serialPort_.write( ba );
                     
@@ -69,7 +72,7 @@ namespace strateam{
                         std::cout << "response: " << (resp.empty() ? "EMPTY" : resp.data() ) << std::endl;
                         return MessageWrapper::fromData( resp.data() ).decode();
                     }else{
-                        std::cout << "Timeout for request " << msg.data() << std::endl;
+                        std::cout << "Timeout for request " << ba.data() << std::endl;
                     }
 
                     return MessageWrapper();
@@ -145,7 +148,7 @@ namespace strateam{
                 void readAll(){
                     std::unique_lock<std::mutex> _( mtx_ );
                     
-                    if( cv_.wait_for( _, std::chrono::milliseconds( 5000 ) ) == std::cv_status::no_timeout ){
+                    if( cv_.wait_for( _, std::chrono::milliseconds( 500 ) ) == std::cv_status::no_timeout ){
                         auto resp = std::move( ba_ );
                         assert( ba_.empty() );
                         std::cout << __func__ << resp.data() << std::endl;
@@ -155,7 +158,11 @@ namespace strateam{
                 }
 
                 void closeConnection(){
-                    serialPort_.close();
+                    try{
+                        serialPort_.close();
+                    }catch( std::exception const& ex ){
+                        std::cout << "close err: " << ex.what() << std::endl;
+                    }
                 }
             };
         }

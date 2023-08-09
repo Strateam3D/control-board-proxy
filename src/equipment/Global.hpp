@@ -2,7 +2,7 @@
 
 namespace strateam{
     namespace equipment{
-        enum class AxisType{
+        enum AxisType{
             X,
             Y,
             Z
