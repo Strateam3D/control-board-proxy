@@ -141,7 +141,7 @@ void ControlBoardTU::visit( ApplicationMessage& msg ){
         }else{
             auto dialogPtr = std::make_shared< Dialog >( *this, equipment_, dialogId, MasterNcdJsonDom );
             
-            if( dialogPtr->dispatch( doc ) == Dialog::CallResult::Keep ){
+            if( dialogPtr->dispatch( doc ) == equipment::MotionResult::Accepted ){
                 dialogs_[ dialogId ] = dialogPtr;
             }
         }

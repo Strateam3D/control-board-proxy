@@ -18,10 +18,6 @@ namespace strateam{
 
         class Dialog : public equipment::ListenerInterface{
         public:// == TYPES ==
-            enum class CallResult{
-                Keep,
-                Discard
-            };
             
             using DocumentPtr = std::shared_ptr<rapidjson::Document>;
             
@@ -31,7 +27,7 @@ namespace strateam{
             std::string                     dialogId_;
             NamedGetterSetterMap_T          gettersSetters_;
             rapidjson::Document&            masterDocument_;
-            CallResult                      rval_{ CallResult::Discard };
+            equipment::MotionResult         motret_{ equipment::MotionResult::Success };
             std::string                     axis_;
         public:
             Dialog( ControlBoardTU& tu, equipment::EquipmentInterface& eq, std::string dialogId, rapidjson::Document& masterDocument );
@@ -39,7 +35,7 @@ namespace strateam{
             Dialog& operator =( Dialog const& ) = delete;
             ~Dialog();
         public:
-            CallResult dispatch( DocumentPtr docPtr );
+            equipment::MotionResult dispatch( DocumentPtr docPtr );
 
         private:// == ListenerInterface ==
             virtual void motionDone( equipment::MotionResult motret ) override;
