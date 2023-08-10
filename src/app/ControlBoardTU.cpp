@@ -1,6 +1,7 @@
 #include "ControlBoardTU.hpp"
-#include "equipment/interface/EquipmentInterface.hpp"
+#include "equipment/makeEquipment.hpp"
 #include "Dialog.hpp"
+#include "eq-common/rjapi/Settings.hpp"
 
 //eq-common
 #include "eq-common/rjapi/Helper.hpp"
@@ -90,8 +91,9 @@ rj::Document DocumentFromString( const char* str ){
 
 namespace strateam::control_board{
 
-ControlBoardTU::ControlBoardTU( MQTTStack& stack, equipment::EquipmentInterface& equipment )
-: stack_( stack )
+ControlBoardTU::ControlBoardTU( MQTTStack& stack, equipment::EquipmentInterface&  equipment, std::shared_ptr<AbstractTU::IoCtx> ioPtr )
+: AbstractTU( ioPtr )
+, stack_( stack )
 , equipment_( equipment )
 {
 }
@@ -126,7 +128,7 @@ void ControlBoardTU::visit( ApplicationMessage& msg ){
             '{"equipment": { "axis" : { "x" : { "move" : { "offset" : 1000 } } } } }'  # To move offset.
             '{"equipment": { "axis" : { "x" : { "position" : null } } } }'  # To get current position.
             )||";
-            std::string rspTopic = MakeResponseTopic( dialogId );
+            std::string rspTopic = dialogId + "/rsp";
             mqtt::message_ptr pubmsg = mqtt::make_message( rspTopic, HelpResponse );
             stack_.publish( pubmsg );
             return;

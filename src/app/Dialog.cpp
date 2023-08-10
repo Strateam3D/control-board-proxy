@@ -414,7 +414,7 @@ equipment::MotionResult Dialog::dispatch( DocumentPtr docPtr ){
     RegistryHandler registryHandler( masterDocument_, *response, *docPtr, gettersSetters_ );
     rj::KeyValueSaxHandler<RegistryHandler> saxHandler( registryHandler );
     docPtr->Accept( saxHandler );
-    std::string rspTopic = MakeResponseTopic( dialogId_ );
+    std::string rspTopic = dialogId_ + "/rsp";
     rj::StringBuffer buffer = StringifyRjValue( *response );
     std::cout << "Outgoing response:\n" << "rspTopic:" << rspTopic << "\nbody: " << buffer.GetString();
     mqtt::message_ptr rsp = mqtt::make_message( rspTopic, buffer.GetString() );
@@ -426,7 +426,7 @@ void Dialog::motionDone( equipment::MotionResult motret ){
     std::string responseTopic = dialogId_ + "/notify";
 
     rj::Document doc;
-    rj::SetValueByPointer(doc, rj::Pointer( "/equipment/axis" + axis_ + "/move" ), motret.success() );
+    rj::SetValueByPointer(doc, rj::Pointer( "/equipment/axis/" + axis_ + "/move" ), motret.success() );
     rj::StringBuffer buffer = StringifyRjValue( doc );
     std::cout << __func__ << buffer.GetString() <<  std::endl;
     mqtt::message_ptr rsp = mqtt::make_message( responseTopic, buffer.GetString() );
@@ -438,7 +438,7 @@ void Dialog::motionToDone( equipment::MotionResult motret ){
     std::string responseTopic = dialogId_ + "/notify";
 
     rj::Document doc;
-    rj::SetValueByPointer(doc, rj::Pointer( "/equipment/axis" + axis_ + "/moveTo" ), motret.success() );
+    rj::SetValueByPointer(doc, rj::Pointer( "/equipment/axis/" + axis_ + "/moveTo" ), motret.success() );
     rj::StringBuffer buffer = StringifyRjValue( doc );
     std::cout << __func__ << buffer.GetString() <<  std::endl;
     mqtt::message_ptr rsp = mqtt::make_message( responseTopic, buffer.GetString() );
@@ -450,7 +450,7 @@ void Dialog::moveHomeDone( equipment::MotionResult motret){
     std::string responseTopic = dialogId_ + "/notify";
 
     rj::Document doc;
-    rj::SetValueByPointer(doc, rj::Pointer( "/equipment/axis" + axis_ + "/moveHome" ), motret.success() );
+    rj::SetValueByPointer(doc, rj::Pointer( "/equipment/axis/" + axis_ + "/moveHome" ), motret.success() );
     rj::StringBuffer buffer = StringifyRjValue( doc );
     std::cout << __func__ << buffer.GetString() <<  std::endl;
     mqtt::message_ptr rsp = mqtt::make_message( responseTopic, buffer.GetString() );
@@ -462,7 +462,7 @@ void Dialog::moveToZeroDone( equipment::MotionResult motret ){
     std::string responseTopic = dialogId_ + "/notify";
 
     rj::Document doc;
-    rj::SetValueByPointer(doc, rj::Pointer( "/equipment/axis" + axis_ + "/moveToZero" ), motret.success() );
+    rj::SetValueByPointer(doc, rj::Pointer( "/equipment/axis/" + axis_ + "/moveToZero" ), motret.success() );
     rj::StringBuffer buffer = StringifyRjValue( doc );
     std::cout << __func__ << buffer.GetString() <<  std::endl;
     mqtt::message_ptr rsp = mqtt::make_message( responseTopic, buffer.GetString() );

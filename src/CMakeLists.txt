@@ -17,6 +17,8 @@ list( APPEND cb_src
     app/ControlBoardTU.hpp
     app/Dialog.cpp
     app/Dialog.hpp
+    app/ControlBoardApp.cpp
+    app/ControlBoardApp.hpp
 
     utils/StringUtils.hpp
 )
@@ -48,6 +50,7 @@ if( BUILD_ARM )
         asan
         mqttStack
         rjapi
+        boost_program_options
     )
 else()
     add_executable(${CONTROL_BOARD_TARGET} ${cb_src})
@@ -57,6 +60,7 @@ else()
         boost_system
         mqttStack
         rjapi
+        boost_program_options
     )    
 endif()
 

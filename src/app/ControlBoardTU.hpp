@@ -29,7 +29,7 @@ namespace strateam{
             using DialogPtr = std::shared_ptr<Dialog>;
             using DialogSetMap = std::unordered_map<std::string, DialogPtr>;
         public:// == CTOR ==
-            ControlBoardTU( MQTTStack& stack, equipment::EquipmentInterface& equipment );
+            ControlBoardTU( MQTTStack& stack, equipment::EquipmentInterface&  equipment, std::shared_ptr<AbstractTU::IoCtx> io );
             ControlBoardTU( ControlBoardTU const& ) = delete;
             ControlBoardTU& operator =( ControlBoardTU const& ) = delete;
 

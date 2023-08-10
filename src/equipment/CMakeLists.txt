@@ -29,6 +29,7 @@ target_sources( ${CONTROL_BOARD_TARGET} PUBLIC
     serial_port/AsyncSerialPort.hpp
 PRIVATE
     serial_port/AsyncSerialPort.cpp
+    makeEquipment.cpp
     
 )
 
