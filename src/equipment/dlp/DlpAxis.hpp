@@ -157,7 +157,7 @@ namespace strateam{
                         decel = DefaultDecel * microstep_; 
                 }
 
-            private:// == MEMBERS ==
+            protected:// == MEMBERS ==
                 std::size_t axisId_;
                 unsigned short microstep_{DefaultMicroStep};
                 std::string axisName_;

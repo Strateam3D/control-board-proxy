@@ -33,7 +33,7 @@ namespace strateam{
                 if( f_ )
                     return MotionResult::AlreadyMoving;
 
-                f_ = [this]( MotionResult ret ){ notify( &ListenerIntarface::motionDone, ret ); };
+                f_ = [this]( MotionResult ret ){ notify( &ListenerInterface::motionDone, ret ); };
                 auto response = transport_.sendRequestGetResponse( AxisImpl::move( offset, speed, accel, decel ) );
                 MotionResult motret = AxisImpl::handleRespondCommandGo( response.getSource() );
                 std::cout << "ret: " << motret.str() << std::endl;
@@ -45,7 +45,7 @@ namespace strateam{
                 if( f_ )
                     return MotionResult::AlreadyMoving;
 
-                f_ = [this]( MotionResult ret ){ notify( &ListenerIntarface::motionDone, ret ); };
+                f_ = [this]( MotionResult ret ){ notify( &ListenerInterface::motionDone, ret ); };
                 auto response = transport_.sendRequestGetResponse( AxisImpl::moveTo( target, speed, accel, decel ) );
                 MotionResult motret = AxisImpl::handleRespondCommandGo( response.getSource() );
                 handleMotionResult(motret);
@@ -56,7 +56,7 @@ namespace strateam{
                 if( f_ )
                     return MotionResult::AlreadyMoving;
 
-                f_ = [this]( MotionResult ret ){ notify( &ListenerIntarface::moveToZeroDone, ret ); };
+                f_ = [this]( MotionResult ret ){ notify( &ListenerInterface::moveToZeroDone, ret ); };
                 auto response = transport_.sendRequestGetResponse( AxisImpl::moveZero( speed, accel, decel ) );
                 MotionResult motret = AxisImpl::handleRespondCommandGo( response.getSource() );
                 handleMotionResult(motret);

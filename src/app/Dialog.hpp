@@ -6,6 +6,8 @@
 
 #include "rjapi/NamedGetterSetter.hpp"
 
+#include "equipment/interface/ListenerInterface.hpp"
+
 namespace strateam{
     namespace equipment{
         class EquipmentInterface;
@@ -14,7 +16,7 @@ namespace strateam{
     namespace control_board{
         class ControlBoardTU;
 
-        class Dialog /* : public ListenerInterface*/{
+        class Dialog : public equipment::ListenerInterface{
         public:// == TYPES ==
             enum class CallResult{
                 Keep,
@@ -30,10 +32,20 @@ namespace strateam{
             NamedGetterSetterMap_T          gettersSetters_;
             rapidjson::Document&            masterDocument_;
             CallResult                      rval_{ CallResult::Discard };
+            std::string                     axis_;
         public:
             Dialog( ControlBoardTU& tu, equipment::EquipmentInterface& eq, std::string dialogId, rapidjson::Document& masterDocument );
+            Dialog( Dialog const& ) = delete;
+            Dialog& operator =( Dialog const& ) = delete;
+            ~Dialog();
         public:
             CallResult dispatch( DocumentPtr docPtr );
+
+        private:// == ListenerInterface ==
+            virtual void motionDone( equipment::MotionResult motret ) override;
+            virtual void motionToDone( equipment::MotionResult motret ) override;
+            virtual void moveHomeDone( equipment::MotionResult motret) override;
+            virtual void moveToZeroDone( equipment::MotionResult motret ) override;
         }; 
     }
 }

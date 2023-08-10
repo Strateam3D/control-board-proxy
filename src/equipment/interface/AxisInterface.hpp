@@ -6,7 +6,7 @@
 
 namespace strateam{
     namespace equipment{
-        class AxisInterface : public Listenable<ListenerIntarface>{
+        class AxisInterface : public Listenable<ListenerInterface>{
         public:
             virtual ~AxisInterface(){}
             virtual bool isMoving() = 0;

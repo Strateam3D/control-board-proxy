@@ -39,6 +39,7 @@ namespace strateam{
             virtual void shutdown()override;
 
             void endDialog( std::string dialogId );
+            void publish( std::shared_ptr<const mqtt::message> msg );
         public:// == TUVisitor ==
             virtual void visit( ConnectedMessage & ) override;
             virtual void visit( ApplicationMessage& msg ) override;

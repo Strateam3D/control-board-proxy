@@ -3,9 +3,9 @@
 
 namespace strateam{
     namespace equipment{
-        class ListenerIntarface{
+        class ListenerInterface{
         public:
-            virtual ~ListenerIntarface(){}
+            virtual ~ListenerInterface(){}
             virtual void motionDone( MotionResult motret ) = 0;
             virtual void motionToDone( MotionResult motret ) = 0;
             virtual void moveHomeDone(MotionResult motret) = 0;

@@ -13,6 +13,9 @@
 #include <iostream>
 #include "rjapi/RegistryHandler.hpp"
 
+// mqtt
+#include "mqttStack/MQTTStack.hpp"
+#include "mqtt/message.h"
 
 
 namespace rj = rapidjson;
@@ -33,9 +36,17 @@ Dialog::Dialog( ControlBoardTU& tu, equipment::EquipmentInterface& eq, std::stri
                 try{
                     int  spd = v["spd"].GetInt();
                     auto& axis = equipment_.axis( equipment::AxisType::X );
-                    auto motret = axis.moveHome( static_cast<double>( spd ) );
-                    rval_ = motret == equipment::MotionResult::Accepted ? CallResult::Keep : CallResult::Discard; 
-                    return motret == equipment::MotionResult::Accepted ? ResponseCode::Accepted : ResponseCode::Failed;
+                    auto motret = axis.moveHome( static_cast<double>( spd ) ); 
+                    
+                    if ( motret == equipment::MotionResult::Accepted ){
+                        axis_ = "x";
+                        rval_ = CallResult::Keep;
+                        return ResponseCode::Accepted;
+                    } else {
+                        rval_ =  CallResult::Discard;
+                        return ResponseCode::Failed;
+                    }
+                    
                 }catch( std::exception const& ex ){
                     return ResponseCode::Failed;
                 }
@@ -48,11 +59,19 @@ Dialog::Dialog( ControlBoardTU& tu, equipment::EquipmentInterface& eq, std::stri
             /*get*/nullptr,
             /*set*/[ this ]( rj::Value& v ) -> ResponseCode{
                 try{
+                    axis_ = "x";
                     int  spd = v["spd"].GetInt();
                     auto& axis = equipment_.axis( equipment::AxisType::X );
                     auto motret = axis.moveZero( static_cast<double>( spd ) );
-                    rval_ = motret == equipment::MotionResult::Accepted ? CallResult::Keep : CallResult::Discard;
-                    return motret == equipment::MotionResult::Accepted ? ResponseCode::Accepted : ResponseCode::Failed;
+                    
+                    if ( motret == equipment::MotionResult::Accepted ){
+                        axis_ = "x";
+                        rval_ = CallResult::Keep;
+                        return ResponseCode::Accepted;
+                    } else {
+                        rval_ =  CallResult::Discard;
+                        return ResponseCode::Failed;
+                    }
                 }catch( std::exception const& ex ){
                     return ResponseCode::Failed;
                 }
@@ -65,12 +84,20 @@ Dialog::Dialog( ControlBoardTU& tu, equipment::EquipmentInterface& eq, std::stri
             /*get*/nullptr,
             /*set*/[ this ]( rj::Value& v ) -> ResponseCode{
                 try{
+                    axis_ = "x";
                     int  spd = v["spd"].GetInt();
                     int  offset = v["offset"].GetInt();
                     auto& axis = equipment_.axis( equipment::AxisType::X );
                     auto motret = axis.move( dim::MotorStep( offset ), static_cast<double>( spd ) );
-                    rval_ = motret == equipment::MotionResult::Accepted ? CallResult::Keep : CallResult::Discard;
-                    return motret == equipment::MotionResult::Accepted ? ResponseCode::Accepted : ResponseCode::Failed;
+
+                    if ( motret == equipment::MotionResult::Accepted ){
+                        axis_ = "x";
+                        rval_ = CallResult::Keep;
+                        return ResponseCode::Accepted;
+                    } else {
+                        rval_ =  CallResult::Discard;
+                        return ResponseCode::Failed;
+                    }
                 }catch( std::exception const& ex ){
                     return ResponseCode::Failed;
                 }
@@ -81,7 +108,7 @@ Dialog::Dialog( ControlBoardTU& tu, equipment::EquipmentInterface& eq, std::stri
         rj::Pointer( "/equipment/axis/x/stop" ),
         GetterSetter(
             /*get*/nullptr,
-            /*set*/[ this ]( rj::Value& v ) -> ResponseCode{
+            /*set*/[ this ]( rj::Value& ) -> ResponseCode{
                 try{
                     auto& axis = equipment_.axis( equipment::AxisType::X );
                     axis.stop();
@@ -133,11 +160,19 @@ Dialog::Dialog( ControlBoardTU& tu, equipment::EquipmentInterface& eq, std::stri
             /*get*/nullptr,
             /*set*/[ this ]( rj::Value& v ) -> ResponseCode{
                 try{
+                    axis_ = "y";
                     int  spd = v["spd"].GetInt();
                     auto& axis = equipment_.axis( equipment::AxisType::Y );
                     auto motret = axis.moveHome( static_cast<double>( spd ) );
-                    rval_ = motret == equipment::MotionResult::Accepted ? CallResult::Keep : CallResult::Discard; 
-                    return motret == equipment::MotionResult::Accepted ? ResponseCode::Accepted : ResponseCode::Failed;
+                    
+                    if ( motret == equipment::MotionResult::Accepted ){
+                        axis_ = "y";
+                        rval_ = CallResult::Keep;
+                        return ResponseCode::Accepted;
+                    } else {
+                        rval_ =  CallResult::Discard;
+                        return ResponseCode::Failed;
+                    }
                 }catch( std::exception const& ex ){
                     return ResponseCode::Failed;
                 }
@@ -153,8 +188,15 @@ Dialog::Dialog( ControlBoardTU& tu, equipment::EquipmentInterface& eq, std::stri
                     int  spd = v["spd"].GetInt();
                     auto& axis = equipment_.axis( equipment::AxisType::Y );
                     auto motret = axis.moveZero( static_cast<double>( spd ) );
-                    rval_ = motret == equipment::MotionResult::Accepted ? CallResult::Keep : CallResult::Discard;
-                    return motret == equipment::MotionResult::Accepted ? ResponseCode::Accepted : ResponseCode::Failed;
+                    
+                    if ( motret == equipment::MotionResult::Accepted ){
+                        axis_ = "y";
+                        rval_ = CallResult::Keep;
+                        return ResponseCode::Accepted;
+                    } else {
+                        rval_ =  CallResult::Discard;
+                        return ResponseCode::Failed;
+                    }
                 }catch( std::exception const& ex ){
                     return ResponseCode::Failed;
                 }
@@ -171,8 +213,15 @@ Dialog::Dialog( ControlBoardTU& tu, equipment::EquipmentInterface& eq, std::stri
                     int  offset = v["offset"].GetInt();
                     auto& axis = equipment_.axis( equipment::AxisType::Y );
                     auto motret = axis.move( dim::MotorStep( offset ), static_cast<double>( spd ) );
-                    rval_ = motret == equipment::MotionResult::Accepted ? CallResult::Keep : CallResult::Discard;
-                    return motret == equipment::MotionResult::Accepted ? ResponseCode::Accepted : ResponseCode::Failed;
+                    
+                    if ( motret == equipment::MotionResult::Accepted ){
+                        axis_ = "y";
+                        rval_ = CallResult::Keep;
+                        return ResponseCode::Accepted;
+                    } else {
+                        rval_ =  CallResult::Discard;
+                        return ResponseCode::Failed;
+                    }
                 }catch( std::exception const& ex ){
                     return ResponseCode::Failed;
                 }
@@ -183,7 +232,7 @@ Dialog::Dialog( ControlBoardTU& tu, equipment::EquipmentInterface& eq, std::stri
         rj::Pointer( "/equipment/axis/y/stop" ),
         GetterSetter(
             /*get*/nullptr,
-            /*set*/[ this ]( rj::Value& v ) -> ResponseCode{
+            /*set*/[ this ]( rj::Value& ) -> ResponseCode{
                 try{
                     auto& axis = equipment_.axis( equipment::AxisType::Y );
                     axis.stop();
@@ -239,8 +288,15 @@ Dialog::Dialog( ControlBoardTU& tu, equipment::EquipmentInterface& eq, std::stri
                     int  spd = v["spd"].GetInt();
                     auto& axis = equipment_.axis( equipment::AxisType::Z );
                     auto motret = axis.moveHome( static_cast<double>( spd ) );
-                    rval_ = motret == equipment::MotionResult::Accepted ? CallResult::Keep : CallResult::Discard; 
-                    return motret == equipment::MotionResult::Accepted ? ResponseCode::Accepted : ResponseCode::Failed;
+                    
+                    if ( motret == equipment::MotionResult::Accepted ){
+                        axis_ = "z";
+                        rval_ = CallResult::Keep;
+                        return ResponseCode::Accepted;
+                    } else {
+                        rval_ =  CallResult::Discard;
+                        return ResponseCode::Failed;
+                    }
                 }catch( std::exception const& ex ){
                     return ResponseCode::Failed;
                 }
@@ -256,8 +312,15 @@ Dialog::Dialog( ControlBoardTU& tu, equipment::EquipmentInterface& eq, std::stri
                     int  spd = v["spd"].GetInt();
                     auto& axis = equipment_.axis( equipment::AxisType::Z );
                     auto motret = axis.moveZero( static_cast<double>( spd ) );
-                    rval_ = motret == equipment::MotionResult::Accepted ? CallResult::Keep : CallResult::Discard;
-                    return motret == equipment::MotionResult::Accepted ? ResponseCode::Accepted : ResponseCode::Failed;
+                    
+                    if ( motret == equipment::MotionResult::Accepted ){
+                        axis_ = "z";
+                        rval_ = CallResult::Keep;
+                        return ResponseCode::Accepted;
+                    } else {
+                        rval_ =  CallResult::Discard;
+                        return ResponseCode::Failed;
+                    }
                 }catch( std::exception const& ex ){
                     return ResponseCode::Failed;
                 }
@@ -274,8 +337,15 @@ Dialog::Dialog( ControlBoardTU& tu, equipment::EquipmentInterface& eq, std::stri
                     int  offset = v["offset"].GetInt();
                     auto& axis = equipment_.axis( equipment::AxisType::Z );
                     auto motret = axis.move( dim::MotorStep( offset ), static_cast<double>( spd ) );
-                    rval_ = motret == equipment::MotionResult::Accepted ? CallResult::Keep : CallResult::Discard;
-                    return motret == equipment::MotionResult::Accepted ? ResponseCode::Accepted : ResponseCode::Failed;
+                    
+                    if ( motret == equipment::MotionResult::Accepted ){
+                        axis_ = "z";
+                        rval_ = CallResult::Keep;
+                        return ResponseCode::Accepted;
+                    } else {
+                        rval_ =  CallResult::Discard;
+                        return ResponseCode::Failed;
+                    }
                 }catch( std::exception const& ex ){
                     return ResponseCode::Failed;
                 }
@@ -286,7 +356,7 @@ Dialog::Dialog( ControlBoardTU& tu, equipment::EquipmentInterface& eq, std::stri
         rj::Pointer( "/equipment/axis/z/stop" ),
         GetterSetter(
             /*get*/nullptr,
-            /*set*/[ this ]( rj::Value& v ) -> ResponseCode{
+            /*set*/[ this ]( rj::Value& ) -> ResponseCode{
                 try{
                     auto& axis = equipment_.axis( equipment::AxisType::Z );
                     axis.stop();
@@ -333,11 +403,67 @@ Dialog::Dialog( ControlBoardTU& tu, equipment::EquipmentInterface& eq, std::stri
     }
 }
 , masterDocument_( masterDocument ){
-    
+    equipment_.axis( equipment::AxisType::X ).subscribe( this );
+    equipment_.axis( equipment::AxisType::Y ).subscribe( this );
+    equipment_.axis( equipment::AxisType::Z ).subscribe( this );
+}
+
+Dialog::~Dialog(){
+    equipment_.axis( equipment::AxisType::X ).unsubscribe( this );
+    equipment_.axis( equipment::AxisType::Y ).unsubscribe( this );
+    equipment_.axis( equipment::AxisType::Z ).unsubscribe( this );
 }
 
 Dialog::CallResult Dialog::dispatch( DocumentPtr docPtr ){
     return rval_;
+}
+
+void Dialog::motionDone( equipment::MotionResult motret ){
+    std::string responseTopic = dialogId_ + "/notify";
+
+    rj::Document doc;
+    rj::SetValueByPointer(doc, rj::Pointer( "/equipment/axis" + axis_ + "/move" ), motret.success() );
+    rj::StringBuffer buffer = StringifyRjValue( doc );
+    std::cout << __func__ << buffer.GetString() <<  std::endl;
+    mqtt::message_ptr rsp = mqtt::make_message( responseTopic, buffer.GetString() );
+    tu_.publish( rsp );
+    tu_.endDialog( dialogId_ );
+}
+
+void Dialog::motionToDone( equipment::MotionResult motret ){
+    std::string responseTopic = dialogId_ + "/notify";
+
+    rj::Document doc;
+    rj::SetValueByPointer(doc, rj::Pointer( "/equipment/axis" + axis_ + "/moveTo" ), motret.success() );
+    rj::StringBuffer buffer = StringifyRjValue( doc );
+    std::cout << __func__ << buffer.GetString() <<  std::endl;
+    mqtt::message_ptr rsp = mqtt::make_message( responseTopic, buffer.GetString() );
+    tu_.publish( rsp );
+    tu_.endDialog( dialogId_ );
+}
+
+void Dialog::moveHomeDone( equipment::MotionResult motret){
+    std::string responseTopic = dialogId_ + "/notify";
+
+    rj::Document doc;
+    rj::SetValueByPointer(doc, rj::Pointer( "/equipment/axis" + axis_ + "/moveHome" ), motret.success() );
+    rj::StringBuffer buffer = StringifyRjValue( doc );
+    std::cout << __func__ << buffer.GetString() <<  std::endl;
+    mqtt::message_ptr rsp = mqtt::make_message( responseTopic, buffer.GetString() );
+    tu_.publish( rsp );
+    tu_.endDialog( dialogId_ );
+}
+
+void Dialog::moveToZeroDone( equipment::MotionResult motret ){
+    std::string responseTopic = dialogId_ + "/notify";
+
+    rj::Document doc;
+    rj::SetValueByPointer(doc, rj::Pointer( "/equipment/axis" + axis_ + "/moveToZero" ), motret.success() );
+    rj::StringBuffer buffer = StringifyRjValue( doc );
+    std::cout << __func__ << buffer.GetString() <<  std::endl;
+    mqtt::message_ptr rsp = mqtt::make_message( responseTopic, buffer.GetString() );
+    tu_.publish( rsp );
+    tu_.endDialog( dialogId_ );
 }
 
 }
