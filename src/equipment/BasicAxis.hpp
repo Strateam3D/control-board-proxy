@@ -28,7 +28,11 @@ namespace strateam{
                 return AxisImpl::template into<typename AxisImpl::Moving>( response.getSource() );
             }
 
+            // FIXME: check is moving otherwise callback will be rewritten
             virtual MotionResult move( dim::MotorStep const& offset, double speed, double accel, double decel ) override{
+                if( f_ )
+                    return MotionResult::AlreadyMoving;
+
                 f_ = [this]( MotionResult ret ){ notify( &ListenerIntarface::motionDone, ret ); };
                 auto response = transport_.sendRequestGetResponse( AxisImpl::move( offset, speed, accel, decel ) );
                 MotionResult motret = AxisImpl::handleRespondCommandGo( response.getSource() );
@@ -38,7 +42,9 @@ namespace strateam{
             }
 
             virtual MotionResult moveTo( dim::MotorStep const& target, double speed, double accel, double decel )override{
-                // f_ = ListenerIntarface::motionToDone;
+                if( f_ )
+                    return MotionResult::AlreadyMoving;
+
                 f_ = [this]( MotionResult ret ){ notify( &ListenerIntarface::motionDone, ret ); };
                 auto response = transport_.sendRequestGetResponse( AxisImpl::moveTo( target, speed, accel, decel ) );
                 MotionResult motret = AxisImpl::handleRespondCommandGo( response.getSource() );
@@ -47,7 +53,9 @@ namespace strateam{
             }
 
             virtual MotionResult moveZero( double speed, double accel, double decel ) override{
-                // f_ = ListenerIntarface::moveToZeroDone;
+                if( f_ )
+                    return MotionResult::AlreadyMoving;
+
                 f_ = [this]( MotionResult ret ){ notify( &ListenerIntarface::moveToZeroDone, ret ); };
                 auto response = transport_.sendRequestGetResponse( AxisImpl::moveZero( speed, accel, decel ) );
                 MotionResult motret = AxisImpl::handleRespondCommandGo( response.getSource() );
@@ -117,6 +125,7 @@ namespace strateam{
                                 }catch(...){}
                                 
                                 f_(MotionResult::Timeout);
+                                f_ = {};
                             }else{  // continue requesting
                                 isMotionDoneTimer_.expires_from_now( isMotionDoneRequestPeriodMs_ );
                                 isMotionDoneTimer_.async_wait( [this]( error_code err ){ 
@@ -125,12 +134,14 @@ namespace strateam{
                             }
                         }else{ //
                             f_( MotionResult::Success );
+                            f_ = {};
                         }
                     }catch(std::exception const& ex){
                         std::cout << "poll err: " << ex.what() << std::endl;
                     }
                 }else{  // if canceled, expected this is done from stop()
                     f_( MotionResult::Stopped );
+                    f_ = {};
                 }
             }
         private:

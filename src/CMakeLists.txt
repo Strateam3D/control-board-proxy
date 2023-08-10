@@ -13,6 +13,12 @@ include_directories(
 
 list( APPEND cb_src
     main.cpp
+    app/ControlBoardTU.cpp
+    app/ControlBoardTU.hpp
+    app/Dialog.cpp
+    app/Dialog.hpp
+
+    utils/StringUtils.hpp
 )
 
 set(CONTROL_BOARD_TARGET control_board)
