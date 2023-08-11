@@ -335,8 +335,8 @@ Dialog::Dialog( ControlBoardTU& tu, equipment::EquipmentInterface& eq, std::stri
                     if ( motret_ == equipment::MotionResult::Accepted ){
                         axis_ = "z";
                         std::cout << motret_.str() << std::endl;
-                        rj::Value rsp( int(ResponseCode::Accepted) );
-                        v = rsp;
+                        // rj::Value rsp( int(ResponseCode::Accepted) );
+                        // v = rsp;
                         return ResponseCode::Accepted;
                     } else {
                         throw equipment::Exception( motret_.str() );
