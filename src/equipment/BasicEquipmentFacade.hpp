@@ -22,7 +22,7 @@ namespace strateam{
             using Axises = std::unordered_map<AxisType, AxisPtr>;
 
         public:
-            BasicEquipmentFacade( boost::asio::io_context& ctx, rapidjson::Value const& config )
+            BasicEquipmentFacade( IoCtx& ctx, rapidjson::Value const& config )
             : transport_( sureConfig( config, rj::Pointer("/controlBoard") ) ){
                 auto const* val = rj::GetValueByPointer( config, "/axises" );
 

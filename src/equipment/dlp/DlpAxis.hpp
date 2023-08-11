@@ -65,6 +65,7 @@ namespace strateam{
                 }
 
                 rj::Document move( dim::MotorStep const& offset, double speed, double accel, double decel ){
+                    std::cout << axisName_ << " " << __func__ << std::endl;
                     fixSpeedAccelDecel( speed,accel,decel );
                     rapidjson::Document req(rj::kObjectType);
                     auto& alloc = req.GetAllocator();

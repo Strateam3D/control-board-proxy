@@ -2,12 +2,13 @@
 
 #include "rapidjson/document.h"
 #include <memory>
-#include <boost/asio/io_context.hpp>
+
+#include "../Global.hpp"
 
 namespace strateam{
     namespace equipment{
         class EquipmentInterface;
 
-        auto makeEquipment(boost::asio::io_context& ctx, rapidjson::Value const& config ) -> std::unique_ptr< EquipmentInterface >;
+        auto makeEquipment(IoCtx& ctx, rapidjson::Value const& config ) -> std::unique_ptr< EquipmentInterface >;
     }
 }

@@ -5,7 +5,7 @@ namespace strateam{
     namespace equipment{
         namespace dlp{
             struct DlpEquipment : public BasicEquipmentFacade<UsbJsonDlp>{
-                DlpEquipment( boost::asio::io_context& ctx, rapidjson::Value const& config ) : BasicEquipmentFacade<UsbJsonDlp>( ctx, config ){}
+                DlpEquipment( IoCtx& ctx, rapidjson::Value const& config ) : BasicEquipmentFacade<UsbJsonDlp>( ctx, config ){}
             };
         }
     }

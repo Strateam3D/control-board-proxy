@@ -4,6 +4,8 @@
 #include <string>
 #include <boost/asio.hpp>
 
+#include "../Global.hpp"
+
 namespace strateam{
     class MQTTStack;
 
@@ -15,8 +17,8 @@ namespace strateam{
         class ControlBoardTU;
 
         class ControlBoardApp{
-            std::shared_ptr<boost::asio::io_context>        ioCtx_;
-            std::shared_ptr<boost::asio::io_context::work>  work_;
+            std::shared_ptr<IoCtx>                          ioCtx_;
+            std::shared_ptr<IoWork>                         work_;
             std::unique_ptr<MQTTStack>                      stackPtr_;
             std::unique_ptr<equipment::EquipmentInterface>  eqPtr_;
             std::unique_ptr<ControlBoardTU>                 tuPtr_;

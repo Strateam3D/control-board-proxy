@@ -4,7 +4,7 @@
 #include "AxisSelector.hpp"
 
 // boost
-#include <boost/asio.hpp>
+#include "Global.hpp"
 
 // std
 #include <chrono>
@@ -18,7 +18,7 @@ namespace strateam{
             using AxisImpl = typename AxisSelector<TagT>::type;
             using F = std::function<void(MotionResult)>;
         public:// == ctor ==
-            BasicAxis( boost::asio::io_context& ctx, std::size_t axisId, Transport& t ) : AxisImpl( axisId ), ctx_( ctx ), transport_( t ){}
+            BasicAxis( IoCtx& ctx, std::size_t axisId, Transport& t ) : AxisImpl( axisId ), ctx_( ctx ), transport_( t ){}
             BasicAxis( AxisImpl const& ) = delete;
             BasicAxis& operator =( BasicAxis const& ) = delete;
 
@@ -150,7 +150,7 @@ namespace strateam{
                 // }
             }
         private:
-            boost::asio::io_context&    ctx_;
+            IoCtx&                      ctx_;
             Transport&                  transport_;
             boost::asio::deadline_timer isMotionDoneTimer_{ctx_};
             boost::posix_time::millisec isMotionDoneRequestPeriodMs_{300};
