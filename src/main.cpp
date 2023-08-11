@@ -67,8 +67,8 @@ int main( int argc, char** argv ){
     try{
         auto & app = strateam::control_board::ControlBoardApp::getInstance();
         app.init( cfg );
-        int rval = app.run();
-        return rval;
+        app.run();
+        return 0;
     }catch( std::exception const& ex ){
         std::cout << ex.what() << std::endl;
         return -1;

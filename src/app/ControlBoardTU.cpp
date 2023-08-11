@@ -153,7 +153,7 @@ void ControlBoardTU::visit( ApplicationMessage& msg ){
 }
 
 void ControlBoardTU::endDialog( std::string dialogId ){
-    dialogs_.erase( dialogId );
+    ctx_->post( [this, dialogId](){ dialogs_.erase( dialogId ); } );
 }
 
 void ControlBoardTU::publish( mqtt::const_message_ptr msg ){

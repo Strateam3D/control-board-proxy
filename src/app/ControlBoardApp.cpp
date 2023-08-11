@@ -72,6 +72,7 @@ void ControlBoardApp::shutdown(){
     work_.reset();
     stackPtr_->removeTU( tuPtr_.get() );
     tuPtr_ -> shutdown();
+    std::cout << "ControlBoardApp::shutdown" << std::endl;
 }
 
 

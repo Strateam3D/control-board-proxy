@@ -88,7 +88,7 @@ Dialog::Dialog( ControlBoardTU& tu, equipment::EquipmentInterface& eq, std::stri
                     int  offset = v["offset"].GetInt();
                     auto& axis = equipment_.axis( equipment::AxisType::X );
                     motret_ = axis.move( dim::MotorStep( offset ), static_cast<double>( spd ) );
-
+                    
                     if ( motret_ == equipment::MotionResult::Accepted ){
                         axis_ = "x";
                         return ResponseCode::Accepted;
@@ -325,7 +325,7 @@ Dialog::Dialog( ControlBoardTU& tu, equipment::EquipmentInterface& eq, std::stri
         rj::Pointer( "/equipment/axis/z/move" ),
         GetterSetter(
             /*get*/nullptr,
-            /*set*/[ this ]( rj::Value& v ) -> ResponseCode{
+            /*set*/[ this ]( rj::Value& v, rj::Value::AllocatorType& alloc ) -> ResponseCode{
                 try{
                     int  spd = v["spd"].GetInt();
                     int  offset = v["offset"].GetInt();
@@ -334,6 +334,9 @@ Dialog::Dialog( ControlBoardTU& tu, equipment::EquipmentInterface& eq, std::stri
                     
                     if ( motret_ == equipment::MotionResult::Accepted ){
                         axis_ = "z";
+                        std::cout << motret_.str() << std::endl;
+                        rj::Value rsp( int(ResponseCode::Accepted) );
+                        v = rsp;
                         return ResponseCode::Accepted;
                     } else {
                         throw equipment::Exception( motret_.str() );
@@ -428,7 +431,7 @@ void Dialog::motionDone( equipment::MotionResult motret ){
     rj::Document doc;
     rj::SetValueByPointer(doc, rj::Pointer( "/equipment/axis/" + axis_ + "/move" ), motret.success() );
     rj::StringBuffer buffer = StringifyRjValue( doc );
-    std::cout << __func__ << buffer.GetString() <<  std::endl;
+    std::cout << "Dialog::motionDone: " << buffer.GetString() <<  std::endl;
     mqtt::message_ptr rsp = mqtt::make_message( responseTopic, buffer.GetString() );
     tu_.publish( rsp );
     tu_.endDialog( dialogId_ );

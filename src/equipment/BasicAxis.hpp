@@ -110,7 +110,7 @@ namespace strateam{
             void isMotionDonePeriodicalCallback( boost::system::error_code err ){
                 std::cout << __func__ << std::endl;
                 using boost::system::error_code;
-                
+                std::cout << err.message() << std::endl;
                 if(!err){
                     try{
                         auto retval = isMoving();
@@ -133,16 +133,21 @@ namespace strateam{
                                 } );
                             }
                         }else{ //
+                            isMotionDoneTimer_.cancel();
                             f_( MotionResult::Success );
-                            f_ = {};
+                            f_ = {};    
                         }
                     }catch(std::exception const& ex){
                         std::cout << "poll err: " << ex.what() << std::endl;
+                        f_(MotionResult::FAILED);
+                        f_ = {};
+                        stop();
                     }
-                }else{  // if canceled, expected this is done from stop()
-                    f_( MotionResult::Stopped );
-                    f_ = {};
                 }
+                // else{  // if canceled, expected this is done from stop()
+                //     f_( MotionResult::Stopped );
+                //     f_ = {};
+                // }
             }
         private:
             boost::asio::io_context&    ctx_;
