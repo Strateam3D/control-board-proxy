@@ -30,7 +30,7 @@ static bool isDlp( std::string const& name ){
     return name == "dlp" || name == "DLP";
 }
 
-auto makeEquipment(boost::asio::io_context& ctx, rapidjson::Value const& config ) -> std::unique_ptr< EquipmentInterface >{
+auto makeEquipment(IoCtx& ctx, rapidjson::Value const& config ) -> std::unique_ptr< EquipmentInterface >{
     std::string board = getBoardName(config);
     
     if( isDlp(board) ){

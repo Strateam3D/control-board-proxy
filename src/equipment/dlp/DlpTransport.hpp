@@ -6,6 +6,7 @@
 
 #include <iostream>
 #include <mutex>
+#include <condition_variable>
 #include "../serial_port/AsyncSerialPort.hpp"
 
 namespace strateam{

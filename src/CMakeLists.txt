@@ -50,7 +50,6 @@ if( BUILD_ARM )
         asan
         mqttStack
         rjapi
-        boost_program_options
     )
 else()
     add_executable(${CONTROL_BOARD_TARGET} ${cb_src})

@@ -41,8 +41,8 @@ constexpr const char* DefaultDocumentStr = R"||(
 namespace strateam::control_board{
 
 ControlBoardApp::ControlBoardApp()
-: ioCtx_( std::make_shared< boost::asio::io_context >() )
-, work_( std::make_shared< boost::asio::io_context::work >( *ioCtx_ ) )
+: ioCtx_( std::make_shared< IoCtx >() )
+, work_( std::make_shared< IoWork >( *ioCtx_ ) )
 {
 }
 
@@ -65,6 +65,7 @@ void ControlBoardApp::init( std::string const& cfgPath ){
 int ControlBoardApp::run(){
     stackPtr_->start();
     ioCtx_->run();
+    return 0;
 }
 
 void ControlBoardApp::shutdown(){

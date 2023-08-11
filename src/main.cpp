@@ -6,7 +6,7 @@
 #include <boost/program_options.hpp>
 
 using namespace strateam::equipment;
-using namespace std::literals::chrono_literals;
+// using namespace std::literals::chrono_literals;
 
 namespace po = boost::program_options;
 
@@ -37,6 +37,8 @@ void install_signal_handlers(){
 
 
 int main( int argc, char** argv ){
+    std::string cfg;
+#ifndef BUILD_ARM
     po::options_description desc("Options");
     desc.add_options()
         ("help", "./control_board -c /path/to/cfg")
@@ -48,11 +50,9 @@ int main( int argc, char** argv ){
     po::notify(vm);    
 
     if (vm.count("help")) {
-        std::cout << "./control_board -c /path/to/cfg" << "\n";
+        std::cout << "./control_board --c /path/to/cfg" << "\n";
         return 0;
     }
-
-    std::string cfg;
 
     if (vm.count("c")) {
         cfg = vm["c"].as<std::string>();
@@ -61,6 +61,14 @@ int main( int argc, char** argv ){
         std::cout << "Path not provided.\n";
         return -1;
     }
+#else
+    if( argc == 3 && argv[ 1 ] == std::string("--c") ){
+        cfg = argv[ 2 ];
+    }else{
+        std::cout << "./control_board -c /path/to/cfg" << "\n";
+        return -1;
+    }
+#endif
 
     install_signal_handlers();
     
