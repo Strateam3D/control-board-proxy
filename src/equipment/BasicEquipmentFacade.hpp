@@ -24,14 +24,14 @@ namespace strateam{
         public:
             BasicEquipmentFacade( boost::asio::io_context& ctx, rapidjson::Value const& config )
             : transport_( sureConfig( config, rj::Pointer("/controlBoard") ) ){
-                auto const* val = rj::GetValueByPointer( config, "/equipment/axises" );
+                auto const* val = rj::GetValueByPointer( config, "/axises" );
 
                 if( !val || !val->IsArray() ){
                     throw Exception( "Invalid configuration" );
                 }
 
                 
-                auto const& axises = config["equipment"]["axises"].GetArray();
+                auto const& axises = config["axises"].GetArray();
                 std::size_t id = 0;
 
                 for( rj::Value::ConstValueIterator it = axises.Begin(); it != axises.End(); it++, id ++ ){

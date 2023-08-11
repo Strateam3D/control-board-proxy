@@ -8,7 +8,7 @@ namespace strateam::equipment{
 
 static std::string getBoardName( rj::Value const& config ){
     std::string board;   
-    auto rjboard = rj::GetValueByPointer( config, "/controlBoard" );
+    auto const* rjboard = rj::GetValueByPointer( config, "/controlBoard" );
     
     if( rjboard != nullptr ){
         if( rjboard->IsObject() ){
@@ -27,10 +27,10 @@ static std::string getBoardName( rj::Value const& config ){
 }
 
 static bool isDlp( std::string const& name ){
-    return name == "Dlp" || name == "DLP";
+    return name == "dlp" || name == "DLP";
 }
 
-auto makeEquipment(boost::asio::io_context& ctx, rapidjson::Document const& config ) -> std::unique_ptr< EquipmentInterface >{
+auto makeEquipment(boost::asio::io_context& ctx, rapidjson::Value const& config ) -> std::unique_ptr< EquipmentInterface >{
     std::string board = getBoardName(config);
     
     if( isDlp(board) ){

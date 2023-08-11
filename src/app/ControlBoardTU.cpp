@@ -38,7 +38,7 @@ constexpr const char* RegistryJsonStr = R"||(
                 "moveHome" : {
                     "spd" : 1000
                 },
-                "moveToZero": : {
+                "moveToZero": {
                     "spd" : 1000
                 },
                 "move": {

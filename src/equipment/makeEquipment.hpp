@@ -8,6 +8,6 @@ namespace strateam{
     namespace equipment{
         class EquipmentInterface;
 
-        auto makeEquipment(boost::asio::io_context& ctx, rapidjson::Document const& config ) -> std::unique_ptr< EquipmentInterface >;
+        auto makeEquipment(boost::asio::io_context& ctx, rapidjson::Value const& config ) -> std::unique_ptr< EquipmentInterface >;
     }
 }

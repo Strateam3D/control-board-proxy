@@ -55,7 +55,8 @@ void ControlBoardApp::init( std::string const& cfgPath ){
     Settings::getInstance().load( cfgPath, DefaultDocumentStr );
     auto& settings = Settings::getInstance();
     stackPtr_ = std::make_unique< MQTTStack >( settings.getValue<std::string>( "/mqtt/address" ), settings.getValue<std::string>( "/mqtt/clientId" ) );
-    eqPtr_ = equipment::makeEquipment( *ioCtx_, settings.getDoc() );
+    rj::Value const& eqCfg = settings.getDoc()["equipment"];
+    eqPtr_ = equipment::makeEquipment( *ioCtx_, eqCfg );
     tuPtr_ = std::make_unique< ControlBoardTU >( *stackPtr_, *eqPtr_, ioCtx_ );
     stackPtr_->addTU( tuPtr_.get() );
 }
