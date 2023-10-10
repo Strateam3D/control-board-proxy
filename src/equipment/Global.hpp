@@ -5,7 +5,8 @@ namespace strateam{
         enum AxisType{
             M1,
             M2,
-            Z
+            Z,
+            H1
         };
     }
 }

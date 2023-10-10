@@ -18,6 +18,7 @@ namespace strateam{
             virtual void stop() = 0;
             virtual dim::Um position() = 0;
             virtual dim::Um homePosition() = 0;
+            virtual void setHomePosition(dim::MotorStep const& pos) = 0;
         };
     }
 }

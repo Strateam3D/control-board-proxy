@@ -44,9 +44,10 @@ namespace strateam{
 
 
                 rapidjson::Document isMoving(){
-                    static rj::Pointer p( (pointerName_ + "/go") .c_str() );
+                    // std::cout << "axis: " << axisId_ << ", pointerName_: " << pointerName_
+                    rj::Pointer p( (pointerName_ + "/go") .c_str() );
                     // std::cout << "pointerName_1: " << pointerName_ << std::endl;
-                    static rj::Pointer pos( ( pointerName_ + "/pos").c_str() );
+                    rj::Pointer pos( ( pointerName_ + "/pos").c_str() );
                     // std::cout << "pointerName_2: " << pointerName_ << std::endl;
                     rapidjson::Document req;
                     rj::SetValueByPointer( req, p, rj::kNullType );
@@ -55,7 +56,7 @@ namespace strateam{
                 }
 
                 bool isMovingResult( rj::Document const& doc ){
-                    static rj::Pointer p( ( pointerName_ + "/go" ).c_str());
+                    rj::Pointer p( ( pointerName_ + "/go" ).c_str());
                     auto const* val = rj::GetValueByPointer( doc, p );
 
                     if( !val || !val->IsBool() )

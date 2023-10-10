@@ -9,6 +9,7 @@ include_directories(
     ${CMAKE_SOURCE_DIR}/src 
     ${CMAKE_SOURCE_DIR}/3rdParty/rj/include 
     ${CMAKE_SOURCE_DIR}/3rdParty
+    ${CMAKE_SOURCE_DIR}/3rdParty/spdlog/include 
 )
 
 list( APPEND cb_src
@@ -50,6 +51,7 @@ if( BUILD_ARM )
         asan
         mqttStack
         rjapi
+        spdlog::spdlog_header_only
     )
 else()
     add_executable(${CONTROL_BOARD_TARGET} ${cb_src})
@@ -60,6 +62,7 @@ else()
         mqttStack
         rjapi
         boost_program_options
+        spdlog::spdlog_header_only
     )    
 endif()
 

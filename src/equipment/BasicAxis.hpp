@@ -35,7 +35,7 @@ namespace strateam{
             }
 
             // FIXME: check is moving otherwise callback will be rewritten
-            virtual MotionResult move( dim::Um const& offset, dim::UmVelocity speed, double accel, double decel ) override{
+            virtual MotionResult move( dim::Um const& offset, dim::UmVelocity speed, double , double  ) override{
                 if( f_ )
                     return MotionResult::AlreadyMoving;
 
@@ -43,7 +43,7 @@ namespace strateam{
                 dim::MotorStep offMs = dim::DimensionConverter<dim::MotorStep>::apply( offset, stepsPerUm_ );
                 dim::MotorStep dExposureDistance = offMs + stepResidual_;
                 dim::MotorStep dist{0.0};
-                stepResidual_ = std::modf( dExposureDistance, &dist );
+                stepResidual_ = ModF( dExposureDistance, dist );
                 dim::MotorStepVelocity vMS = dim::DimensionConverter<dim::MotorStepVelocity>::apply( speed, stepsPerUm_ );
                 auto response = transport_.sendRequestGetResponse( AxisImpl::move( dist, vMS.value() ) );
                 MotionResult motret = AxisImpl::handleRespondCommandGo( response.getSource() );
@@ -52,7 +52,7 @@ namespace strateam{
                 return motret;
             }
 
-            virtual MotionResult moveTo( dim::Um const& target,dim::UmVelocity speed, double accel, double decel )override{
+            virtual MotionResult moveTo( dim::Um const& target,dim::UmVelocity speed, double, double )override{
                 if( f_ )
                     return MotionResult::AlreadyMoving;
 
@@ -65,7 +65,7 @@ namespace strateam{
                 return motret;
             }
 
-            virtual MotionResult moveTo( dim::MotorStep const& target, double speed, double accel, double decel )override{
+            virtual MotionResult moveTo( dim::MotorStep const& target, double speed, double , double )override{
                 if( f_ )
                     return MotionResult::AlreadyMoving;
 
@@ -76,7 +76,7 @@ namespace strateam{
                 return motret;
             }
 
-            virtual MotionResult moveZero( dim::UmVelocity speed, double accel, double decel ) override{
+            virtual MotionResult moveZero( dim::UmVelocity speed, double , double  ) override{
                 if( f_ )
                     return MotionResult::AlreadyMoving;
 
@@ -105,8 +105,8 @@ namespace strateam{
                 return posUM;
             }
 
-            virtual dim::MotorStep homePosition() override{
-                return homePosition_;
+            virtual dim::Um homePosition() override{
+                return dim::DimensionConverter<dim::Um> :: apply( homePosition_, stepsPerUm_ );
             }
 
             virtual void setHomePosition(dim::MotorStep const& pos) override{

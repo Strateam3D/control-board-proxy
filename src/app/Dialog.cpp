@@ -313,7 +313,7 @@ Dialog::Dialog( ControlBoardTU& tu, equipment::EquipmentInterface& eq, std::stri
         rj::Pointer( "/equipment/axis/z/move" ),
         GetterSetter(
             /*get*/nullptr,
-            /*set*/[ this ]( rj::Value& v, rj::Value::AllocatorType& alloc ) -> ResponseCode{
+            /*set*/[ this ]( rj::Value& v, rj::Value::AllocatorType& ) -> ResponseCode{
                 try{
                     dim::UmVelocity  spd( v["spd"].GetInt() );
                     dim::Um  offset( v["offset"].GetInt() );

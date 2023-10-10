@@ -7,3 +7,6 @@
 [submodule "src/eq-common"]
 	path = src/eq-common
 	url = git@github.com:Strateam3D/eq-common.git
+[submodule "3rdParty/spdlog"]
+	path = 3rdParty/spdlog
+	url = https://github.com/gabime/spdlog.git

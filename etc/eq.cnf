@@ -1,7 +1,45 @@
 {
-    "equipment" : {
-        "controlBoard" : {
-
-        }
+    "equipment": {
+            "controlBoard" : {
+                "name" : "dlp",
+                "device" : "/dev/ttyACM0",
+                "baudRate" : 115200
+            },
+            "axises" : [
+                {
+                    "name": "motor1",
+                    "homePos": -50000,
+                    "stepsPerUm" : 0.8,
+                    "msPerInch"  : 20298
+                },
+                {
+                    "name": "motor2",
+                    "homePos": -50000,
+                    "stepsPerUm" : 0.8,
+                    "msPerInch"  : 20298
+                },
+                {
+                    "name": "motor3",
+                    "homePos": -50000,
+                    "stepsPerUm" : 0.8,
+                    "msPerInch"  : 20298
+                },
+                {
+                    "name": "h1",
+                    "homePos": -50000,
+                    "stepsPerUm" : 0.8,
+                    "msPerInch"  : 20298
+                },
+                {
+                    "name": "h2",
+                    "homePos": -50000,
+                    "stepsPerUm" : 0.8,
+                    "msPerInch"  : 20298
+                }
+            ]
+    },
+    "mqtt" : {
+        "address" : "tcp://localhost:1883",
+        "clientId" : "mqtt-control-board-equipment"
     }
 }
