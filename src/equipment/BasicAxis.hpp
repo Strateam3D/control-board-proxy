@@ -2,7 +2,7 @@
 #include "interface/AxisInterface.hpp"
 #include "TransportSelector.hpp"
 #include "AxisSelector.hpp"
-
+#include "eq-common/Converter.hpp"
 // boost
 #include "Global.hpp"
 
@@ -18,7 +18,13 @@ namespace strateam{
             using AxisImpl = typename AxisSelector<TagT>::type;
             using F = std::function<void(MotionResult)>;
         public:// == ctor ==
-            BasicAxis( IoCtx& ctx, std::size_t axisId, Transport& t ) : AxisImpl( axisId ), ctx_( ctx ), transport_( t ){}
+            BasicAxis( IoCtx& ctx, std::size_t axisId, Transport& t, const double stepsPerUm ) 
+            : AxisImpl( axisId )
+            , ctx_( ctx )
+            , transport_( t )
+            , stepsPerUm_( stepsPerUm )
+            {}
+
             BasicAxis( AxisImpl const& ) = delete;
             BasicAxis& operator =( BasicAxis const& ) = delete;
 
@@ -29,14 +35,32 @@ namespace strateam{
             }
 
             // FIXME: check is moving otherwise callback will be rewritten
-            virtual MotionResult move( dim::MotorStep const& offset, double speed, double accel, double decel ) override{
+            virtual MotionResult move( dim::Um const& offset, dim::UmVelocity speed, double accel, double decel ) override{
                 if( f_ )
                     return MotionResult::AlreadyMoving;
 
                 f_ = [this]( MotionResult ret ){ notify( &ListenerInterface::motionDone, ret ); };
-                auto response = transport_.sendRequestGetResponse( AxisImpl::move( offset, speed, accel, decel ) );
+                dim::MotorStep offMs = dim::DimensionConverter<dim::MotorStep>::apply( offset, stepsPerUm_ );
+                dim::MotorStep dExposureDistance = offMs + stepResidual_;
+                dim::MotorStep dist{0.0};
+                stepResidual_ = std::modf( dExposureDistance, &dist );
+                dim::MotorStepVelocity vMS = dim::DimensionConverter<dim::MotorStepVelocity>::apply( speed, stepsPerUm_ );
+                auto response = transport_.sendRequestGetResponse( AxisImpl::move( dist, vMS.value() ) );
                 MotionResult motret = AxisImpl::handleRespondCommandGo( response.getSource() );
                 std::cout << "ret: " << motret.str() << std::endl;
+                handleMotionResult(motret);
+                return motret;
+            }
+
+            virtual MotionResult moveTo( dim::Um const& target,dim::UmVelocity speed, double accel, double decel )override{
+                if( f_ )
+                    return MotionResult::AlreadyMoving;
+
+                dim::MotorStep tarMs = dim::DimensionConverter<dim::MotorStep>::apply( target, stepsPerUm_ );
+                dim::MotorStepVelocity vMS = dim::DimensionConverter<dim::MotorStepVelocity>::apply( speed, stepsPerUm_ );
+                f_ = [this]( MotionResult ret ){ notify( &ListenerInterface::motionDone, ret ); };
+                auto response = transport_.sendRequestGetResponse( AxisImpl::moveTo( tarMs, vMS.value() ) );
+                MotionResult motret = AxisImpl::handleRespondCommandGo( response.getSource() );
                 handleMotionResult(motret);
                 return motret;
             }
@@ -46,25 +70,27 @@ namespace strateam{
                     return MotionResult::AlreadyMoving;
 
                 f_ = [this]( MotionResult ret ){ notify( &ListenerInterface::motionDone, ret ); };
-                auto response = transport_.sendRequestGetResponse( AxisImpl::moveTo( target, speed, accel, decel ) );
+                auto response = transport_.sendRequestGetResponse( AxisImpl::moveTo( target, speed ) );
                 MotionResult motret = AxisImpl::handleRespondCommandGo( response.getSource() );
                 handleMotionResult(motret);
                 return motret;
             }
 
-            virtual MotionResult moveZero( double speed, double accel, double decel ) override{
+            virtual MotionResult moveZero( dim::UmVelocity speed, double accel, double decel ) override{
                 if( f_ )
                     return MotionResult::AlreadyMoving;
 
+                dim::MotorStepVelocity vMS = dim::DimensionConverter<dim::MotorStepVelocity>::apply( speed, stepsPerUm_ );
                 f_ = [this]( MotionResult ret ){ notify( &ListenerInterface::moveToZeroDone, ret ); };
-                auto response = transport_.sendRequestGetResponse( AxisImpl::moveZero( speed, accel, decel ) );
+                auto response = transport_.sendRequestGetResponse( AxisImpl::moveZero( vMS.value() ) );
                 MotionResult motret = AxisImpl::handleRespondCommandGo( response.getSource() );
                 handleMotionResult(motret);
                 return motret;
             }
 
-            virtual MotionResult moveHome( double speed, double accel, double decel ) override{
-                return moveTo( homePosition_, speed, accel, decel );
+            virtual MotionResult moveHome( dim::UmVelocity speed, double accel, double decel ) override{
+                dim::MotorStepVelocity vMS = dim::DimensionConverter<dim::MotorStepVelocity>::apply( speed, stepsPerUm_ );
+                return moveTo( homePosition_, vMS.value(), accel, decel );
             }
 
             virtual void stop() override{
@@ -72,9 +98,11 @@ namespace strateam{
                 transport_.sendRequestGetResponse( AxisImpl::stop() );
             }
 
-            virtual dim::MotorStep position() override{
+            virtual dim::Um position() override{
                 auto resp = transport_.sendRequestGetResponse( AxisImpl::position() );
-                return AxisImpl::template into<dim::MotorStep>( resp.getSource() );
+                dim::MotorStep posMS = AxisImpl::template into<dim::MotorStep>( resp.getSource() );
+                dim::Um posUM = dim::DimensionConverter<dim::Um> :: apply( posMS, stepsPerUm_ );
+                return posUM;
             }
 
             virtual dim::MotorStep homePosition() override{
@@ -152,6 +180,7 @@ namespace strateam{
         private:
             IoCtx&                      ctx_;
             Transport&                  transport_;
+            const double                stepsPerUm_{1.0};
             boost::asio::deadline_timer isMotionDoneTimer_{ctx_};
             boost::posix_time::millisec isMotionDoneRequestPeriodMs_{300};
             dim::MotorStep             homePosition_{0.0};
@@ -161,6 +190,8 @@ namespace strateam{
             using milliseconds = std::chrono::milliseconds;
             time_point_milliseconds beginWaitingTimePoint_ = std::chrono::time_point_cast<milliseconds>(std::chrono::system_clock::now());
             milliseconds waitForMotionDoneMaxDuration_ { 300000 };
+
+            dim::MotorStep                  stepResidual_{0.0};
         };
     }
 }

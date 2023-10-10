@@ -11,6 +11,7 @@
 #include "rj/include/rapidjson/stringbuffer.h"
 #include "rj/include/rapidjson/writer.h"
 #include "rjapi/Helper.hpp"
+#include "eq-common/Converter.hpp"
 #include <iostream>
 #include "rjapi/RegistryHandler.hpp"
 
@@ -30,17 +31,17 @@ Dialog::Dialog( ControlBoardTU& tu, equipment::EquipmentInterface& eq, std::stri
 , gettersSetters_{
     // x axis
     NamedGetterSetterPair{
-        rj::Pointer( "/equipment/axis/x/moveHome" ),
+        rj::Pointer( "/equipment/axis/m1/moveHome" ),
         GetterSetter(
             /*get*/nullptr,
             /*set*/[ this ]( rj::Value& v ) -> ResponseCode{
                 try{
-                    int  spd = v["spd"].GetInt();
-                    auto& axis = equipment_.axis( equipment::AxisType::X );
-                    motret_ = axis.moveHome( static_cast<double>( spd ) ); 
+                    dim::UmVelocity  spd( v["spd"].GetInt() );
+                    auto& axis = equipment_.axis( equipment::AxisType::M1 );
+                    motret_ = axis.moveHome( spd ); 
                     
                     if ( motret_ == equipment::MotionResult::Accepted ){
-                        axis_ = "x";
+                        axis_ = "m1";
                         return ResponseCode::Accepted;
                     } else {
                         throw equipment::Exception( motret_.str() );
@@ -54,18 +55,18 @@ Dialog::Dialog( ControlBoardTU& tu, equipment::EquipmentInterface& eq, std::stri
         )
     }
     ,NamedGetterSetterPair{
-        rj::Pointer( "/equipment/axis/x/moveToZero" ),
+        rj::Pointer( "/equipment/axis/m1/moveToZero" ),
         GetterSetter(
             /*get*/nullptr,
             /*set*/[ this ]( rj::Value& v ) -> ResponseCode{
                 try{
                     axis_ = "x";
-                    int  spd = v["spd"].GetInt();
-                    auto& axis = equipment_.axis( equipment::AxisType::X );
-                    motret_ = axis.moveZero( static_cast<double>( spd ) );
+                    dim::UmVelocity  spd( v["spd"].GetInt() );
+                    auto& axis = equipment_.axis( equipment::AxisType::M1 );
+                    motret_ = axis.moveZero( spd );
                     
                     if ( motret_ == equipment::MotionResult::Accepted ){
-                        axis_ = "x";
+                        axis_ = "m1";
                         return ResponseCode::Accepted;
                     } else {
                         throw equipment::Exception( motret_.str() );
@@ -78,19 +79,19 @@ Dialog::Dialog( ControlBoardTU& tu, equipment::EquipmentInterface& eq, std::stri
         )
     }
     ,NamedGetterSetterPair{
-        rj::Pointer( "/equipment/axis/x/move" ),
+        rj::Pointer( "/equipment/axis/m1/move" ),
         GetterSetter(
             /*get*/nullptr,
             /*set*/[ this ]( rj::Value& v ) -> ResponseCode{
                 try{
                     axis_ = "x";
-                    int  spd = v["spd"].GetInt();
+                    dim::UmVelocity  spd( v["spd"].GetInt() );
                     int  offset = v["offset"].GetInt();
-                    auto& axis = equipment_.axis( equipment::AxisType::X );
-                    motret_ = axis.move( dim::MotorStep( offset ), static_cast<double>( spd ) );
+                    auto& axis = equipment_.axis( equipment::AxisType::M1 );
+                    motret_ = axis.move( dim::Um( offset ), spd  );
                     
                     if ( motret_ == equipment::MotionResult::Accepted ){
-                        axis_ = "x";
+                        axis_ = "m1";
                         return ResponseCode::Accepted;
                     } else {
                         throw equipment::Exception( motret_.str() );
@@ -103,12 +104,12 @@ Dialog::Dialog( ControlBoardTU& tu, equipment::EquipmentInterface& eq, std::stri
         )
     }
     ,NamedGetterSetterPair{
-        rj::Pointer( "/equipment/axis/x/stop" ),
+        rj::Pointer( "/equipment/axis/m1/stop" ),
         GetterSetter(
             /*get*/nullptr,
             /*set*/[ this ]( rj::Value& ) -> ResponseCode{
                 try{
-                    auto& axis = equipment_.axis( equipment::AxisType::X );
+                    auto& axis = equipment_.axis( equipment::AxisType::M1 );
                     axis.stop();
                     return ResponseCode::Success;
                 }catch( std::exception const& ex ){
@@ -119,53 +120,46 @@ Dialog::Dialog( ControlBoardTU& tu, equipment::EquipmentInterface& eq, std::stri
         )
     }
     ,NamedGetterSetterPair{
-        rj::Pointer( "/equipment/axis/x/position" ),
+        rj::Pointer( "/equipment/axis/m1/position" ),
         GetterSetter(
             /*get*/[this]() -> rj::Value{
-                return rj::Value( equipment_.axis( equipment::AxisType::X ).position().castTo<int>() );
+                return rj::Value( equipment_.axis( equipment::AxisType::M1 ).position().castTo<int>() );
             },
             /*set*/nullptr
         )
     }
     ,NamedGetterSetterPair{
-        rj::Pointer( "/equipment/axis/x/homePosition" ),
+        rj::Pointer( "/equipment/axis/m1/homePosition" ),
         GetterSetter(
             /*get*/[this]() -> rj::Value{
-                return rj::Value( equipment_.axis( equipment::AxisType::X ).homePosition().castTo<int>() );
+                return rj::Value( equipment_.axis( equipment::AxisType::M1 ).homePosition().castTo<int>() );
             },
-            /*set*/[ this ]( rj::Value& v ) -> ResponseCode{
-                try{
-                    equipment_.axis( equipment::AxisType::X ).setHomePosition( dim::MotorStep( v.GetInt() ) ) ;
-                    return ResponseCode::Success;
-                }catch( std::exception const& ){
-                    return ResponseCode::Failed;
-                }
-            }
+            /*set*/nullptr
         )
     }
     ,NamedGetterSetterPair{
-        rj::Pointer( "/equipment/axis/x/isMoving" ),
+        rj::Pointer( "/equipment/axis/m1/isMoving" ),
         GetterSetter(
             /*get*/[this]() -> rj::Value{
-                return rj::Value( equipment_.axis( equipment::AxisType::X ).isMoving() );
+                return rj::Value( equipment_.axis( equipment::AxisType::M1 ).isMoving() );
             },
             /*set*/nullptr
         )
     }
     // Y axis
     , NamedGetterSetterPair{
-        rj::Pointer( "/equipment/axis/y/moveHome" ),
+        rj::Pointer( "/equipment/axis/m2/moveHome" ),
         GetterSetter(
             /*get*/nullptr,
             /*set*/[ this ]( rj::Value& v ) -> ResponseCode{
                 try{
-                    axis_ = "y";
-                    int  spd = v["spd"].GetInt();
-                    auto& axis = equipment_.axis( equipment::AxisType::Y );
-                    motret_ = axis.moveHome( static_cast<double>( spd ) );
+                    axis_ = "m2";
+                    dim::UmVelocity  spd( v["spd"].GetInt() );
+                    auto& axis = equipment_.axis( equipment::AxisType::M2 );
+                    motret_ = axis.moveHome( spd );
                     
                     if ( motret_ == equipment::MotionResult::Accepted ){
-                        axis_ = "y";
+                        axis_ = "m2";
                         return ResponseCode::Accepted;
                     } else {
                         throw equipment::Exception( motret_.str() );
@@ -177,17 +171,18 @@ Dialog::Dialog( ControlBoardTU& tu, equipment::EquipmentInterface& eq, std::stri
         )
     }
     ,NamedGetterSetterPair{
-        rj::Pointer( "/equipment/axis/y/moveToZero" ),
+        rj::Pointer( "/equipment/axis/m2/moveToZero" ),
         GetterSetter(
             /*get*/nullptr,
             /*set*/[ this ]( rj::Value& v ) -> ResponseCode{
                 try{
-                    int  spd = v["spd"].GetInt();
-                    auto& axis = equipment_.axis( equipment::AxisType::Y );
-                    motret_ = axis.moveZero( static_cast<double>( spd ) );
+                    
+                    dim::UmVelocity  spd( v["spd"].GetInt() );
+                    auto& axis = equipment_.axis( equipment::AxisType::M2 );
+                    motret_ = axis.moveZero( spd );
                     
                     if ( motret_ == equipment::MotionResult::Accepted ){
-                        axis_ = "y";
+                        axis_ = "m2";
                         return ResponseCode::Accepted;
                     } else {
                         throw equipment::Exception( motret_.str() );
@@ -200,18 +195,18 @@ Dialog::Dialog( ControlBoardTU& tu, equipment::EquipmentInterface& eq, std::stri
         )
     }
     ,NamedGetterSetterPair{
-        rj::Pointer( "/equipment/axis/y/move" ),
+        rj::Pointer( "/equipment/axis/m2/move" ),
         GetterSetter(
             /*get*/nullptr,
             /*set*/[ this ]( rj::Value& v ) -> ResponseCode{
                 try{
-                    int  spd = v["spd"].GetInt();
-                    int  offset = v["offset"].GetInt();
-                    auto& axis = equipment_.axis( equipment::AxisType::Y );
-                    motret_ = axis.move( dim::MotorStep( offset ), static_cast<double>( spd ) );
+                    dim::UmVelocity spd( v["spd"].GetInt() );
+                    dim::Um  offset( v["offset"].GetInt() );
+                    auto& axis = equipment_.axis( equipment::AxisType::M2 );
+                    motret_ = axis.move( offset ,spd );
                     
                     if ( motret_ == equipment::MotionResult::Accepted ){
-                        axis_ = "y";
+                        axis_ = "m2";
                         return ResponseCode::Accepted;
                     } else {
                         throw equipment::Exception( motret_.str() );
@@ -224,12 +219,12 @@ Dialog::Dialog( ControlBoardTU& tu, equipment::EquipmentInterface& eq, std::stri
         )
     }
     ,NamedGetterSetterPair{
-        rj::Pointer( "/equipment/axis/y/stop" ),
+        rj::Pointer( "/equipment/axis/m2/stop" ),
         GetterSetter(
             /*get*/nullptr,
             /*set*/[ this ]( rj::Value& ) -> ResponseCode{
                 try{
-                    auto& axis = equipment_.axis( equipment::AxisType::Y );
+                    auto& axis = equipment_.axis( equipment::AxisType::M2 );
                     axis.stop();
                     return ResponseCode::Success;
                 }catch( std::exception const& ex ){
@@ -240,35 +235,28 @@ Dialog::Dialog( ControlBoardTU& tu, equipment::EquipmentInterface& eq, std::stri
         )
     }
     ,NamedGetterSetterPair{
-        rj::Pointer( "/equipment/axis/y/position" ),
+        rj::Pointer( "/equipment/axis/m2/position" ),
         GetterSetter(
             /*get*/[this]() -> rj::Value{
-                return rj::Value( equipment_.axis( equipment::AxisType::Y ).position().castTo<int>() );
+                return rj::Value( equipment_.axis( equipment::AxisType::M2 ).position().castTo<int>() );
             },
             /*set*/nullptr
         )
     }
     ,NamedGetterSetterPair{
-        rj::Pointer( "/equipment/axis/y/homePosition" ),
+        rj::Pointer( "/equipment/axis/m2/homePosition" ),
         GetterSetter(
             /*get*/[this]() -> rj::Value{
-                return rj::Value( equipment_.axis( equipment::AxisType::Y ).homePosition().castTo<int>() );
+                return rj::Value( equipment_.axis( equipment::AxisType::M2 ).homePosition().castTo<int>() );
             },
-            /*set*/[ this ]( rj::Value& v ) -> ResponseCode{
-                try{
-                    equipment_.axis( equipment::AxisType::Y ).setHomePosition( dim::MotorStep( v.GetInt() ) ) ;
-                    return ResponseCode::Success;
-                }catch( std::exception const& ex ){
-                    return ResponseCode::Failed;
-                }
-            }
+            /*set*/nullptr
         )
     }
     ,NamedGetterSetterPair{
-        rj::Pointer( "/equipment/axis/y/isMoving" ),
+        rj::Pointer( "/equipment/axis/m2/isMoving" ),
         GetterSetter(
             /*get*/[this]() -> rj::Value{
-                return rj::Value( equipment_.axis( equipment::AxisType::Y ).isMoving() );
+                return rj::Value( equipment_.axis( equipment::AxisType::M2 ).isMoving() );
             },
             /*set*/nullptr
         )
@@ -281,9 +269,9 @@ Dialog::Dialog( ControlBoardTU& tu, equipment::EquipmentInterface& eq, std::stri
             /*get*/nullptr,
             /*set*/[ this ]( rj::Value& v ) -> ResponseCode{
                 try{
-                    int  spd = v["spd"].GetInt();
+                    dim::UmVelocity  spd( v["spd"].GetInt() );
                     auto& axis = equipment_.axis( equipment::AxisType::Z );
-                    motret_ = axis.moveHome( static_cast<double>( spd ) );
+                    motret_ = axis.moveHome( spd );
                     
                     if ( motret_ == equipment::MotionResult::Accepted ){
                         axis_ = "z";
@@ -304,9 +292,9 @@ Dialog::Dialog( ControlBoardTU& tu, equipment::EquipmentInterface& eq, std::stri
             /*get*/nullptr,
             /*set*/[ this ]( rj::Value& v ) -> ResponseCode{
                 try{
-                    int  spd = v["spd"].GetInt();
+                    dim::UmVelocity  spd( v["spd"].GetInt() );
                     auto& axis = equipment_.axis( equipment::AxisType::Z );
-                    motret_ = axis.moveZero( static_cast<double>( spd ) );
+                    motret_ = axis.moveZero( spd );
                     
                     if ( motret_ == equipment::MotionResult::Accepted ){
                         axis_ = "z";
@@ -327,10 +315,10 @@ Dialog::Dialog( ControlBoardTU& tu, equipment::EquipmentInterface& eq, std::stri
             /*get*/nullptr,
             /*set*/[ this ]( rj::Value& v, rj::Value::AllocatorType& alloc ) -> ResponseCode{
                 try{
-                    int  spd = v["spd"].GetInt();
-                    int  offset = v["offset"].GetInt();
+                    dim::UmVelocity  spd( v["spd"].GetInt() );
+                    dim::Um  offset( v["offset"].GetInt() );
                     auto& axis = equipment_.axis( equipment::AxisType::Z );
-                    motret_ = axis.move( dim::MotorStep( offset ), static_cast<double>( spd ) );
+                    motret_ = axis.move( offset , spd );
                     
                     if ( motret_ == equipment::MotionResult::Accepted ){
                         axis_ = "z";
@@ -378,14 +366,7 @@ Dialog::Dialog( ControlBoardTU& tu, equipment::EquipmentInterface& eq, std::stri
             /*get*/[this]() -> rj::Value{
                 return rj::Value( equipment_.axis( equipment::AxisType::Z ).homePosition().castTo<int>() );
             },
-            /*set*/[ this ]( rj::Value& v ) -> ResponseCode{
-                try{
-                    equipment_.axis( equipment::AxisType::Z ).setHomePosition( dim::MotorStep( v.GetInt() ) ) ;
-                    return ResponseCode::Success;
-                }catch( std::exception const& ex ){
-                    return ResponseCode::Failed;
-                }
-            }
+            /*set*/nullptr
         )
     }
     ,NamedGetterSetterPair{
@@ -399,15 +380,15 @@ Dialog::Dialog( ControlBoardTU& tu, equipment::EquipmentInterface& eq, std::stri
     }
 }
 , masterDocument_( masterDocument ){
-    equipment_.axis( equipment::AxisType::X ).subscribe( this );
-    equipment_.axis( equipment::AxisType::Y ).subscribe( this );
+    equipment_.axis( equipment::AxisType::M1 ).subscribe( this );
+    equipment_.axis( equipment::AxisType::M2 ).subscribe( this );
     equipment_.axis( equipment::AxisType::Z ).subscribe( this );
     std::cout << "Dialog::Dialog " << this << std::endl;
 }
 
 Dialog::~Dialog(){
-    equipment_.axis( equipment::AxisType::X ).unsubscribe( this );
-    equipment_.axis( equipment::AxisType::Y ).unsubscribe( this );
+    equipment_.axis( equipment::AxisType::M1 ).unsubscribe( this );
+    equipment_.axis( equipment::AxisType::M2 ).unsubscribe( this );
     equipment_.axis( equipment::AxisType::Z ).unsubscribe( this );
     std::cout << "Dialog::~Dialog " << this << std::endl;
 }

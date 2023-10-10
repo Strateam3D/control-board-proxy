@@ -3,8 +3,8 @@
 namespace strateam{
     namespace equipment{
         enum AxisType{
-            X,
-            Y,
+            M1,
+            M2,
             Z
         };
     }

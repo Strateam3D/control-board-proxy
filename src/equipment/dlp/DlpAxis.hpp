@@ -64,7 +64,7 @@ namespace strateam{
                     return val->GetBool();
                 }
 
-                rj::Document move( dim::MotorStep const& offset, double speed, double accel, double decel ){
+                rj::Document move( dim::MotorStep const& offset, double speed = -1, double accel = -1, double decel = -1 ){
                     std::cout << axisName_ << " " << __func__ << std::endl;
                     fixSpeedAccelDecel( speed,accel,decel );
                     rapidjson::Document req(rj::kObjectType);
@@ -102,7 +102,7 @@ namespace strateam{
                     return val->GetBool() ? MotionResult::Accepted : MotionResult::FAILED;
                 }
 
-                rj::Document moveTo( dim::MotorStep const& target, double speed, double accel, double decel ){
+                rj::Document moveTo( dim::MotorStep const& target, double speed = -1, double accel = -1, double decel = -1  ){
                     fixSpeedAccelDecel( speed,accel,decel );
                     rapidjson::Document req(rj::kObjectType);
                     auto& alloc = req.GetAllocator();
@@ -117,7 +117,7 @@ namespace strateam{
                     return req;
                 }
 
-                rj::Document moveZero( double speed, double accel, double decel ){
+                rj::Document moveZero( double speed = -1, double accel = -1, double decel = -1  ){
                     fixSpeedAccelDecel( speed,accel,decel );
                     rapidjson::Document req(rj::kObjectType);
                     auto& al = req.GetAllocator();

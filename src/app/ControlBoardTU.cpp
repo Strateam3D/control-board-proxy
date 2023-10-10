@@ -34,7 +34,7 @@ constexpr const char* RegistryJsonStr = R"||(
 {
 	"equipment": {
         "axis" : {
-            "x" : {
+            "m1" : {
                 "moveHome" : {
                     "spd" : 1000
                 },
@@ -50,7 +50,7 @@ constexpr const char* RegistryJsonStr = R"||(
                 "homePosition" : 123345,
                 "isMoving" : true
             },
-            "y" : {
+            "m2" : {
                 "moveHome": true,
                 "moveToZero": true,
                 "move": {
@@ -63,6 +63,30 @@ constexpr const char* RegistryJsonStr = R"||(
                 "isMoving" : true
             },
             "z" : {
+                "moveHome": true,
+                "moveToZero": true,
+                "move": {
+                    "offset" : 1000,
+                    "spd" : 1000
+                },
+                "stop": true,
+                "position": 12345,
+                "homePosition" : 123345,
+                "isMoving" : true
+            },
+            "h1" : {
+                "moveHome": true,
+                "moveToZero": true,
+                "move": {
+                    "offset" : 1000,
+                    "spd" : 1000
+                },
+                "stop": true,
+                "position": 12345,
+                "homePosition" : 123345,
+                "isMoving" : true
+            },
+            "h2" : {
                 "moveHome": true,
                 "moveToZero": true,
                 "move": {

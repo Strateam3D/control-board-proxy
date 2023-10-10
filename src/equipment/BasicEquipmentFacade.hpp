@@ -38,7 +38,8 @@ namespace strateam{
                     const rj::Value::ConstObject& axisValue = it->GetObject();
                     std::string axisName = axisValue[ "name" ].GetString();
                     std::cout << "Creating axis " << axisName << std::endl;
-                    AxisPtr axisPtr = std::make_unique<Axis>( ctx, id, transport_ );
+                    double stepsPerUm = axisValue[ "stepsPerUm" ].GetDouble();
+                    AxisPtr axisPtr = std::make_unique<Axis>( ctx, id, transport_, stepsPerUm );
                     int hp = axisValue[ "homePos" ].GetInt();
                     axisPtr->setHomePosition( dim::MotorStep( hp ) );
                     axises_.emplace( static_cast<AxisType>( id ), std::move( axisPtr ) );
