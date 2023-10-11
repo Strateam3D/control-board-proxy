@@ -130,8 +130,11 @@ namespace strateam{
                     std::cout << "22222 result: " << result.str() << std::endl;
                     if( result == MotionResult::Success || result == MotionResult::Accepted)
                         startPeriodicalRequestMotionIsDone();
+                    else if( result == MotionResult::AlreadyInPosition )
+                        f_ = {};
                 }else{
                     std::cout << "olololo: " << result.str() << std::endl;
+                    f_ = {};
                 }
             }
 

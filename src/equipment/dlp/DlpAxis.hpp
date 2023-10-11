@@ -92,7 +92,7 @@ namespace strateam{
                     if( val->IsString() ){
                         std::string rsp = val->GetString();
 
-                        if( rsp.find( "Already in the targetPosition" ) != std::string::npos ){
+                        if( rsp.find( "Already in the targetPosition" ) != std::string::npos || rsp.find( "AlreadyInPosition" ) != std::string::npos ){
                             return MotionResult::AlreadyInPosition;
                         }else{
                             std::cout << __func__ << "ERR: " << rsp << std::endl;

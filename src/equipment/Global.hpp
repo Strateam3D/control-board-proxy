@@ -6,7 +6,8 @@ namespace strateam{
             M1,
             M2,
             Z,
-            H1
+            H1,
+            H2
         };
     }
 }

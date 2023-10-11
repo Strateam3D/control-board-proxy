@@ -51,8 +51,12 @@ constexpr const char* RegistryJsonStr = R"||(
                 "isMoving" : true
             },
             "m2" : {
-                "moveHome": true,
-                "moveToZero": true,
+                "moveHome": {
+                    "spd" : 1000
+                },
+                "moveToZero": {
+                    "spd" : 1000
+                },
                 "move": {
                     "offset" : 1000,
                     "spd" : 1000
@@ -63,8 +67,12 @@ constexpr const char* RegistryJsonStr = R"||(
                 "isMoving" : true
             },
             "z" : {
-                "moveHome": true,
-                "moveToZero": true,
+                "moveHome": {
+                    "spd" : 1000
+                },
+                "moveToZero": {
+                    "spd" : 1000
+                },
                 "move": {
                     "offset" : 1000,
                     "spd" : 1000
@@ -75,8 +83,12 @@ constexpr const char* RegistryJsonStr = R"||(
                 "isMoving" : true
             },
             "h1" : {
-                "moveHome": true,
-                "moveToZero": true,
+                "moveHome": {
+                    "spd" : 1000
+                },
+                "moveToZero": {
+                    "spd" : 1000
+                },
                 "move": {
                     "offset" : 1000,
                     "spd" : 1000
@@ -87,7 +99,25 @@ constexpr const char* RegistryJsonStr = R"||(
                 "isMoving" : true
             },
             "h2" : {
-                "moveHome": true,
+                "moveHome": {
+                    "spd" : 1000
+                },
+                "moveToZero": {
+                    "spd" : 1000
+                },
+                "move": {
+                    "offset" : 1000,
+                    "spd" : 1000
+                },
+                "stop": true,
+                "position": 12345,
+                "homePosition" : 123345,
+                "isMoving" : true
+            },
+            "beam" : {
+                "moveHome": {
+                    "spd" : 1000
+                },
                 "moveToZero": true,
                 "move": {
                     "offset" : 1000,
@@ -99,6 +129,8 @@ constexpr const char* RegistryJsonStr = R"||(
                 "isMoving" : true
             }
         }
+        }
+        
     }
 }
 )||";
