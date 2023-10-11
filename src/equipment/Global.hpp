@@ -7,7 +7,8 @@ namespace strateam{
             M2,
             Z,
             H1,
-            H2
+            H2,
+            beam
         };
     }
 }

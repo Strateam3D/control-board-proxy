@@ -47,7 +47,7 @@ def publish(client):
     {
         "equipment": {
             "axis" : {
-                "h1" : {
+                "beam" : {
                     "move": {
                         "offset" : 2000,
                         "spd" : 1000

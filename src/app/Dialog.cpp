@@ -391,7 +391,7 @@ Dialog::Dialog( ControlBoardTU& tu, equipment::EquipmentInterface& eq, std::stri
             /*set*/[ this ]( rj::Value& v ) -> ResponseCode{
                 try{
                     dim::UmVelocity  spd( v["spd"].GetInt() );
-                    auto& axis = equipment_.axis( equipment::AxisType::M2 );
+                    auto& axis = equipment_.axis( equipment::AxisType::beam );
                     motret_ = axis.moveHome( spd );
                     
                     if ( motret_ == equipment::MotionResult::Accepted ){
@@ -417,7 +417,7 @@ Dialog::Dialog( ControlBoardTU& tu, equipment::EquipmentInterface& eq, std::stri
             /*set*/[ this ]( rj::Value& v ) -> ResponseCode{
                 try{
                     dim::UmVelocity  spd( v["spd"].GetInt() );
-                    auto& axis = equipment_.axis( equipment::AxisType::M2 );
+                    auto& axis = equipment_.axis( equipment::AxisType::beam );
                     motret_ = axis.moveZero( spd );
                     
                     if ( motret_ == equipment::MotionResult::Accepted ){
@@ -441,7 +441,7 @@ Dialog::Dialog( ControlBoardTU& tu, equipment::EquipmentInterface& eq, std::stri
                 try{
                     dim::UmVelocity  spd( v["spd"].GetInt() );
                     dim::Um  offset( v["offset"].GetInt() );
-                    auto& axis = equipment_.axis( equipment::AxisType::M2 );
+                    auto& axis = equipment_.axis( equipment::AxisType::beam );
                     motret_ = axis.move( offset , spd );
                     
                     if ( motret_ == equipment::MotionResult::Accepted ){
@@ -466,7 +466,7 @@ Dialog::Dialog( ControlBoardTU& tu, equipment::EquipmentInterface& eq, std::stri
             /*get*/nullptr,
             /*set*/[ this ]( rj::Value& ) -> ResponseCode{
                 try{
-                    auto& axis = equipment_.axis( equipment::AxisType::M2 );
+                    auto& axis = equipment_.axis( equipment::AxisType::beam );
                     axis.stop();
                     return ResponseCode::Success;
                 }catch( std::exception const& ex ){
@@ -479,7 +479,7 @@ Dialog::Dialog( ControlBoardTU& tu, equipment::EquipmentInterface& eq, std::stri
         rj::Pointer( "/equipment/axis/beam/position" ),
         GetterSetter(
             /*get*/[this]() -> rj::Value{
-                return rj::Value( equipment_.axis( equipment::AxisType::M2 ).position().castTo<int>() );
+                return rj::Value( equipment_.axis( equipment::AxisType::beam ).position().castTo<int>() );
             },
             /*set*/nullptr
         )
@@ -488,7 +488,7 @@ Dialog::Dialog( ControlBoardTU& tu, equipment::EquipmentInterface& eq, std::stri
         rj::Pointer( "/equipment/axis/beam/homePosition" ),
         GetterSetter(
             /*get*/[this]() -> rj::Value{
-                return rj::Value( equipment_.axis( equipment::AxisType::M2 ).homePosition().castTo<int>() );
+                return rj::Value( equipment_.axis( equipment::AxisType::beam ).homePosition().castTo<int>() );
             },
             /*set*/nullptr
         )
@@ -497,7 +497,7 @@ Dialog::Dialog( ControlBoardTU& tu, equipment::EquipmentInterface& eq, std::stri
         rj::Pointer( "/equipment/axis/beam/isMoving" ),
         GetterSetter(
             /*get*/[this]() -> rj::Value{
-                return rj::Value( equipment_.axis( equipment::AxisType::M2 ).isMoving() );
+                return rj::Value( equipment_.axis( equipment::AxisType::beam ).isMoving() );
             },
             /*set*/nullptr
         )

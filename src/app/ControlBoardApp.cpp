@@ -45,6 +45,12 @@ constexpr const char* DefaultDocumentStr = R"||(
                     "homePos": -5000,
                     "stepsPerUm" : 0.8,
                     "msPerInch"  : 20298
+                },
+                {
+                    "name": "beam",
+                    "homePos": -5000,
+                    "stepsPerUm" : 0.8,
+                    "msPerInch"  : 20298
                 }
             ]
     },
