@@ -272,6 +272,7 @@ Dialog::Dialog( ControlBoardTU& tu, equipment::EquipmentInterface& eq, std::stri
                     dim::UmVelocity  spd( v["spd"].GetInt() );
                     auto& axis = equipment_.axis( equipment::AxisType::Z );
                     motret_ = axis.moveHome( spd );
+                    // std::cout << "z move home "  << motret_.str() << std::endl;
                     
                     if ( motret_ == equipment::MotionResult::Accepted ){
                         axis_ = "z";
@@ -633,7 +634,7 @@ Dialog::Dialog( ControlBoardTU& tu, equipment::EquipmentInterface& eq, std::stri
                     motret_ = axis.moveHome( spd );
                     
                     if ( motret_ == equipment::MotionResult::Accepted ){
-                        axis_ = "h2;
+                        axis_ = "h2";
                         return ResponseCode::Accepted;
                     } else if ( motret_ == equipment::MotionResult::AlreadyInPosition ){
                         return ResponseCode::Success;

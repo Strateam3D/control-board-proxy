@@ -33,10 +33,9 @@ namespace strateam{
                 };
             
             public:// == DlpAxis ==
-                DlpAxis( std::size_t axisId ) 
-                : axisId_( axisId + 1 )
-                , axisName_( "motor" + std::to_string( axisId_ ) )
-                , pointerName_( "/motor" + std::to_string( axisId_ ) )
+                DlpAxis( std::string const& axisName ) 
+                : axisName_( axisName )
+                , pointerName_( std::string( "/" ) + axisName_ )
                 {}
 
                 template<typename T>
@@ -93,6 +92,7 @@ namespace strateam{
                         std::string rsp = val->GetString();
 
                         if( rsp.find( "Already in the targetPosition" ) != std::string::npos || rsp.find( "AlreadyInPosition" ) != std::string::npos ){
+                            // std::cout << "aaaaaaaaaa AlreadyInPosition\n";
                             return MotionResult::AlreadyInPosition;
                         }else{
                             std::cout << __func__ << "ERR: " << rsp << std::endl;
@@ -160,7 +160,6 @@ namespace strateam{
                 }
 
             protected:// == MEMBERS ==
-                std::size_t axisId_;
                 unsigned short microstep_{DefaultMicroStep};
                 std::string axisName_;
                 std::string pointerName_;

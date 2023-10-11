@@ -47,10 +47,10 @@ def publish(client):
     {
         "equipment": {
             "axis" : {
-                "m2" : {
+                "h1" : {
                     "move": {
-                        "spd" : 800,
-                        "offset" : 8000
+                        "offset" : 2000,
+                        "spd" : 1000
                     }
                 }
             }

@@ -18,31 +18,31 @@ constexpr const char* DefaultDocumentStr = R"||(
             "axises" : [
                 {
                     "name": "motor1",
-                    "homePos": -50000,
+                    "homePos": -5000,
                     "stepsPerUm" : 0.8,
                     "msPerInch"  : 20298
                 },
                 {
                     "name": "motor2",
-                    "homePos": -50000,
+                    "homePos": -5000,
                     "stepsPerUm" : 0.8,
                     "msPerInch"  : 20298
                 },
                 {
                     "name": "motor3",
-                    "homePos": -50000,
+                    "homePos": -5000,
                     "stepsPerUm" : 0.8,
                     "msPerInch"  : 20298
                 },
                 {
                     "name": "h1",
-                    "homePos": -50000,
+                    "homePos": -5000,
                     "stepsPerUm" : 0.8,
                     "msPerInch"  : 20298
                 },
                 {
                     "name": "h2",
-                    "homePos": -50000,
+                    "homePos": -5000,
                     "stepsPerUm" : 0.8,
                     "msPerInch"  : 20298
                 }
