@@ -8,6 +8,7 @@ include_directories(
 target_sources( ${CONTROL_BOARD_TARGET} PUBLIC    
     AxisSelector.hpp
     BasicAxis.hpp
+    BasicControlBoard.hpp
     BasicEquipmentFacade.hpp
     BasicMessageWrapper.hpp
     EqException.hpp
@@ -18,6 +19,7 @@ target_sources( ${CONTROL_BOARD_TARGET} PUBLIC
     TransportSelector.hpp
     
     dlp/DlpAxis.hpp
+    dlp/DlpControlBoard.hpp
     dlp/DlpEquipment.hpp
     dlp/DlpTransport.hpp
 

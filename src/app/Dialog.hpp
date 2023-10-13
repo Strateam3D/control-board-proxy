@@ -42,6 +42,7 @@ namespace strateam{
             virtual void motionToDone( equipment::MotionResult motret ) override;
             virtual void moveHomeDone( equipment::MotionResult motret) override;
             virtual void moveToZeroDone( equipment::MotionResult motret ) override;
+            virtual void squeezingDone( equipment::MotionResult motret ) override;
         }; 
     }
 }

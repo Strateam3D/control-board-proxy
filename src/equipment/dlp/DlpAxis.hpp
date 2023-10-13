@@ -8,7 +8,7 @@
 #include "../EqException.hpp"
 
 #include <string>
-#include <iostream>
+// #include <iostream>
 #include <stdexcept>
 
 namespace strateam{
@@ -65,7 +65,6 @@ namespace strateam{
                 }
 
                 rj::Document move( dim::MotorStep const& offset, double speed = -1, double accel = -1, double decel = -1 ){
-                    std::cout << axisName_ << " " << __func__ << std::endl;
                     fixSpeedAccelDecel( speed,accel,decel );
                     rapidjson::Document req(rj::kObjectType);
                     auto& alloc = req.GetAllocator();
@@ -95,7 +94,7 @@ namespace strateam{
                             // std::cout << "aaaaaaaaaa AlreadyInPosition\n";
                             return MotionResult::AlreadyInPosition;
                         }else{
-                            std::cout << __func__ << "ERR: " << rsp << std::endl;
+                            // std::cout << __func__ << "ERR: " << rsp << std::endl;
                             return MotionResult::FAILED;
                         }
                     }

@@ -2,6 +2,7 @@
 #include "ControlBoardTU.hpp"
 #include "equipment/interface/EquipmentInterface.hpp"
 #include "equipment/interface/AxisInterface.hpp"
+#include "interface/ControlBoardInterface.hpp"
 #include "equipment/EqException.hpp"
 
 #include <rapidjson/document.h>
@@ -12,13 +13,15 @@
 #include "rj/include/rapidjson/writer.h"
 #include "rjapi/Helper.hpp"
 #include "eq-common/Converter.hpp"
-#include <iostream>
+
 #include "rjapi/RegistryHandler.hpp"
 
 // mqtt
 #include "mqttStack/MQTTStack.hpp"
 #include "mqtt/message.h"
 
+#include "Symbols.hpp"
+#include "spdlog/spdlog.h"
 
 namespace rj = rapidjson;
 
@@ -742,6 +745,97 @@ Dialog::Dialog( ControlBoardTU& tu, equipment::EquipmentInterface& eq, std::stri
             /*set*/nullptr
         )
     }
+// ----------------------------------------- control board -----------------------------------------
+    ,NamedGetterSetterPair{
+        rj::Pointer( "/equipment/controlBoard/coefs" ),
+        GetterSetter(
+            /*get*/nullptr,
+            /*set*/[ this ]( rj::Value& coefs ) -> ResponseCode{
+                try{
+                    auto const* lval = rj::GetValueByPointer( coefs, "/lk" );
+                    auto const* rval = rj::GetValueByPointer( coefs, "/rk" );
+                    
+                    if( lval && lval->IsDouble() && rval &&rval->IsDouble() ){
+                        auto& cb = equipment_.controlBoard();
+                        double lk = lval->GetDouble();
+                        double rk = rval->GetDouble();
+                        auto retval = cb.setLoadCellCoeffs( lk, rk );
+                        return retval.success() ? ResponseCode::Success : ResponseCode::Failed;
+                    }else{
+                        return ResponseCode::Failed;
+                    }
+                }catch( std::exception const& ex ){
+                    spdlog::get( Symbols::Console() )->error( "coef err {}", ex.what() );
+                    return ResponseCode::Failed;
+                }
+            }
+        )
+    }
+    ,NamedGetterSetterPair{
+        rj::Pointer( "/equipment/controlBoard/setZero" ),
+        GetterSetter(
+            /*get*/nullptr,
+            /*set*/[ this ]( rj::Value& ) -> ResponseCode{
+                try{
+                    auto retval = equipment_.controlBoard().setZero();
+                    return retval.success() ? ResponseCode::Success : ResponseCode::Failed;
+                }catch( std::exception const& ex ){
+                    spdlog::get( Symbols::Console() )->error( "set zero err {}", ex.what() );
+                    return ResponseCode::Failed;
+                }
+            }
+        )
+    }
+    ,NamedGetterSetterPair{
+        rj::Pointer( "/equipment/controlBoard/sendToUart" ),
+        GetterSetter(
+            /*get*/nullptr,
+            /*set*/[ this ]( rj::Value& v ) -> ResponseCode{
+                try{
+                    auto retval = equipment_.controlBoard().sendLogsToUart( v.GetBool() );
+                    return retval.success() ? ResponseCode::Success : ResponseCode::Failed;
+                }catch( std::exception const& ex ){
+                    spdlog::get( Symbols::Console() )->error( "sendToUart err {}", ex.what() );
+                    return ResponseCode::Failed;
+                }
+            }
+        )
+    }
+    ,NamedGetterSetterPair{
+        rj::Pointer( "/equipment/controlBoard/squeeze" ),
+        GetterSetter(
+            /*get*/nullptr,
+            /*set*/[ this ]( rj::Value& v ) -> ResponseCode{
+                try{
+                    dim::Gram  msv( v["msv"].GetInt() );
+                    dim::Gram  sdf( v["sdf"].GetInt() );
+                    dim::MilliSecond  sdt( v["sdt"].GetInt() );
+                    dim::UmVelocity  hv( v["hv"].GetInt() );
+                    dim::UmVelocity  bv( v["bv"].GetInt() );
+                    auto retval = equipment_.controlBoard().squeeze( msv, sdf, sdt, hv, bv );
+                    return retval.success() ? ResponseCode::Success : ResponseCode::Failed;
+                }catch( std::exception const& ex ){
+                    spdlog::get( Symbols::Console() )->error( "sendToUart err {}", ex.what() );
+                    return ResponseCode::Failed;
+                }
+            }
+        )
+    }
+    ,NamedGetterSetterPair{
+        rj::Pointer( "/equipment/controlBoard/stop" ),
+        GetterSetter(
+            /*get*/nullptr,
+            /*set*/[ this ]( rj::Value& ) -> ResponseCode{
+                try{
+                    equipment_.controlBoard().stop();
+                    return ResponseCode::Success;
+                }catch( std::exception const& ex ){
+                    spdlog::get( Symbols::Console() )->error( "sendToUart err {}", ex.what() );
+                    return ResponseCode::Failed;
+                }
+            }
+        )
+    }
 }
 , masterDocument_( masterDocument ){
     equipment_.axis( equipment::AxisType::M1 ).subscribe( this );
@@ -749,7 +843,9 @@ Dialog::Dialog( ControlBoardTU& tu, equipment::EquipmentInterface& eq, std::stri
     equipment_.axis( equipment::AxisType::Z ).subscribe( this );
     equipment_.axis( equipment::AxisType::H1 ).subscribe( this );
     equipment_.axis( equipment::AxisType::H2 ).subscribe( this );
-    std::cout << "Dialog::Dialog " << this << std::endl;
+    equipment_.axis( equipment::AxisType::beam ).subscribe( this );
+    equipment_.controlBoard().subscribe( this );
+    spdlog::get( Symbols::Console() )->debug( "Dialog::Dialog" );
 }
 
 Dialog::~Dialog(){
@@ -758,7 +854,9 @@ Dialog::~Dialog(){
     equipment_.axis( equipment::AxisType::Z ).unsubscribe( this );
     equipment_.axis( equipment::AxisType::H1 ).unsubscribe( this );
     equipment_.axis( equipment::AxisType::H2 ).unsubscribe( this );
-    std::cout << "Dialog::~Dialog " << this << std::endl;
+    equipment_.axis( equipment::AxisType::beam ).unsubscribe( this );
+    equipment_.controlBoard().unsubscribe( this );
+    spdlog::get( Symbols::Console() )->debug( "Dialog::~Dialog" );
 }
 
 equipment::MotionResult Dialog::dispatch( DocumentPtr docPtr ){
@@ -780,7 +878,7 @@ void Dialog::motionDone( equipment::MotionResult motret ){
     rj::Document doc;
     rj::SetValueByPointer(doc, rj::Pointer( "/equipment/axis/" + axis_ + "/move" ), motret.success() );
     rj::StringBuffer buffer = StringifyRjValue( doc );
-    std::cout << "Dialog::motionDone: " << buffer.GetString() <<  std::endl;
+    spdlog::get( Symbols::Console() )->debug( "{} {}", __func__, buffer.GetString() );
     mqtt::message_ptr rsp = mqtt::make_message( responseTopic, buffer.GetString() );
     tu_.publish( rsp );
     tu_.endDialog( dialogId_ );
@@ -792,7 +890,7 @@ void Dialog::motionToDone( equipment::MotionResult motret ){
     rj::Document doc;
     rj::SetValueByPointer(doc, rj::Pointer( "/equipment/axis/" + axis_ + "/moveTo" ), motret.success() );
     rj::StringBuffer buffer = StringifyRjValue( doc );
-    std::cout << __func__ << buffer.GetString() <<  std::endl;
+    spdlog::get( Symbols::Console() )->debug( "{} {}", __func__, buffer.GetString() );
     mqtt::message_ptr rsp = mqtt::make_message( responseTopic, buffer.GetString() );
     tu_.publish( rsp );
     tu_.endDialog( dialogId_ );
@@ -804,7 +902,7 @@ void Dialog::moveHomeDone( equipment::MotionResult motret){
     rj::Document doc;
     rj::SetValueByPointer(doc, rj::Pointer( "/equipment/axis/" + axis_ + "/moveHome" ), motret.success() );
     rj::StringBuffer buffer = StringifyRjValue( doc );
-    std::cout << __func__ << buffer.GetString() <<  std::endl;
+    spdlog::get( Symbols::Console() )->debug( "{} {}", __func__, buffer.GetString() );
     mqtt::message_ptr rsp = mqtt::make_message( responseTopic, buffer.GetString() );
     tu_.publish( rsp );
     tu_.endDialog( dialogId_ );
@@ -816,7 +914,19 @@ void Dialog::moveToZeroDone( equipment::MotionResult motret ){
     rj::Document doc;
     rj::SetValueByPointer(doc, rj::Pointer( "/equipment/axis/" + axis_ + "/moveToZero" ), motret.success() );
     rj::StringBuffer buffer = StringifyRjValue( doc );
-    std::cout << __func__ << buffer.GetString() <<  std::endl;
+    spdlog::get( Symbols::Console() )->debug( "{} {}", __func__, buffer.GetString() );
+    mqtt::message_ptr rsp = mqtt::make_message( responseTopic, buffer.GetString() );
+    tu_.publish( rsp );
+    tu_.endDialog( dialogId_ );
+}
+
+void Dialog::squeezingDone( equipment::MotionResult motret ){
+    std::string responseTopic = dialogId_ + "/notify";
+
+    rj::Document doc;
+    rj::SetValueByPointer(doc, "/equipment/controlBoard/squeeze", motret.success() );
+    rj::StringBuffer buffer = StringifyRjValue( doc );
+    spdlog::get( Symbols::Console() )->debug( "{} {}", __func__, buffer.GetString() );
     mqtt::message_ptr rsp = mqtt::make_message( responseTopic, buffer.GetString() );
     tu_.publish( rsp );
     tu_.endDialog( dialogId_ );

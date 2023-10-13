@@ -1,12 +1,15 @@
 #pragma once
 #include "../BasicMessageWrapper.hpp"
 #include "../EqException.hpp"
+#include "Symbols.hpp"
+#include "spdlog/spdlog.h"
 
 #include "rapidjson/document.h"
 
 #include <iostream>
 #include <mutex>
 #include <condition_variable>
+
 #include "../serial_port/AsyncSerialPort.hpp"
 
 namespace strateam{
@@ -58,7 +61,7 @@ namespace strateam{
                     std::vector<char> ba(prefix.begin(), prefix.end());
                     ba.insert( ba.end(),  msg.data(), msg.data() + msg.size() );
                     ba.insert( ba.end(), suffix.begin(), suffix.end() );
-                    std::cout << "request: "<< ba.data() << std::endl;
+                    spdlog::get( Symbols::Console() )->debug( "request {}", ba.data());
                     
                     return sendRawRequestGetResponse( ba );;
                 }
@@ -70,10 +73,10 @@ namespace strateam{
                     if( cv_.wait_for( _, std::chrono::milliseconds( 5000 ) ) == std::cv_status::no_timeout ){
                         auto resp = std::move( ba_ );
                         assert( ba_.empty() );
-                        std::cout << "response: " << (resp.empty() ? "EMPTY" : resp.data() ) << std::endl;
+                        spdlog::get( Symbols::Console() )->debug( "response {}", resp.empty() ? "EMPTY" : resp.data());
                         return MessageWrapper::fromData( resp.data() ).decode();
                     }else{
-                        std::cout << "Timeout for request " << ba.data() << std::endl;
+                        spdlog::get( Symbols::Console() )->debug( "timeout for req {}", ba.data());
                     }
 
                     return MessageWrapper();
@@ -134,7 +137,7 @@ namespace strateam{
                 }
 
                 void openConnection(){
-                    std::cout << __func__ << " device: " << deviceName_ << ", baud rate: " << baudRate_ << std::endl;
+                    spdlog::get( Symbols::Console() )->debug( "device: {}, baud rate: {}", deviceName_, baudRate_ );
                     serialPort_.setCallback( [this]( char const* data, size_t len ){
                         asyncHandleRead( data, len );
                     } );
@@ -152,9 +155,9 @@ namespace strateam{
                     if( cv_.wait_for( _, std::chrono::milliseconds( 500 ) ) == std::cv_status::no_timeout ){
                         auto resp = std::move( ba_ );
                         assert( ba_.empty() );
-                        std::cout << __func__ << resp.data() << std::endl;
+                        spdlog::get( Symbols::Console() )->debug( "readAll: {}", resp.data() );
                     }else{
-                        std::cout << "Failed to read invitation" << std::endl;
+                        spdlog::get( Symbols::Console() )->error( "Failed to read invitation" );
                     }
                 }
 
@@ -162,7 +165,7 @@ namespace strateam{
                     try{
                         serialPort_.close();
                     }catch( std::exception const& ex ){
-                        std::cout << "close err: " << ex.what() << std::endl;
+                        spdlog::get( Symbols::Console() )->error( "close err: {}", ex.what() );
                     }
                 }
             };

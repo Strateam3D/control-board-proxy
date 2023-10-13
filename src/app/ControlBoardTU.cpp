@@ -128,9 +128,24 @@ constexpr const char* RegistryJsonStr = R"||(
                 "homePosition" : 123345,
                 "isMoving" : true
             }
+        },
+        "controlBoard" : {
+            "coefs" : {
+                "lk" : 1.0,
+                "rk" : 1.0,
+            },
+            "setZero" : true,
+            "sendToUart" : true,
+            "squeeze" : {
+                "msv" : 100, // MinSignalValueToDetectGram[gram]
+                "sdf" : 100, // SignalDeltaFGram[gram]
+                "sdt" : 100, // StableTimeDetectionMS;//[ms]
+                "hv" : 200,	// haydon velocity[steps/s]
+                "bv" : 200, // beam velocity[steps/s]
+                "go" : true
+            },
+            "stop" : true
         }
-        }
-        
     }
 }
 )||";

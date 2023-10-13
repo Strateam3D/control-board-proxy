@@ -10,6 +10,7 @@ namespace strateam{
             virtual void motionToDone( MotionResult motret ) = 0;
             virtual void moveHomeDone(MotionResult motret) = 0;
             virtual void moveToZeroDone( MotionResult motret ) = 0;
+            virtual void squeezingDone( MotionResult motret ) = 0;
         };
     }
 }

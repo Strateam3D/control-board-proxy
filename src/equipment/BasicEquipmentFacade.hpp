@@ -3,6 +3,7 @@
 #include "TransportSelector.hpp"
 #include "BasicAxis.hpp"
 #include "EqException.hpp"
+#include "BasicControlBoard.hpp"
 
 // std
 #include <unordered_map>
@@ -20,6 +21,8 @@ namespace strateam{
             using Axis = BasicAxis<Tag>;
             using AxisPtr = std::unique_ptr<Axis>;
             using Axises = std::unordered_map<AxisType, AxisPtr>;
+            using ControlBoard = BasicControlBoard<Tag>;
+            using ControlBoardPtr = std::unique_ptr<ControlBoard>;
 
         public:
             BasicEquipmentFacade( IoCtx& ctx, rapidjson::Value const& config )
@@ -29,8 +32,7 @@ namespace strateam{
                 if( !val || !val->IsArray() ){
                     throw Exception( "Invalid configuration" );
                 }
-
-                
+          
                 auto const& axises = config["axises"].GetArray();
                 std::size_t id = 0;
 
@@ -44,6 +46,17 @@ namespace strateam{
                     axisPtr->setHomePosition( dim::MotorStep( hp ) );
                     axises_.emplace( static_cast<AxisType>( id ), std::move( axisPtr ) );
                 }
+
+                auto const* haydonStepsPerUmValue = rj::GetValueByPointer( config, "/axises/3/stepsPerUm" );
+                auto const* beamStepsPerUmValue = rj::GetValueByPointer( config, "/axises/0/stepsPerUm" );
+                auto const* kLeft = rj::GetValueByPointer( config, "/equipment/load_cell/kLeft" );
+                auto const* kRight = rj::GetValueByPointer( config, "/equipment/load_cell/kRight" );
+                controlBoard_ = std::make_unique< ControlBoard >( ctx, transport_, haydonStepsPerUmValue->GetDouble(), beamStepsPerUmValue->GetDouble() );
+                auto retval = controlBoard_->setLoadCellCoeffs( kLeft->GetDouble(), kRight->GetDouble() );
+
+                if( retval != decltype(retval)::Success ){
+                    throw Exception( "Failed to set laod cell coefficients" );
+                }
             }
 
         public:// == EquipmentInterafce ==
@@ -52,6 +65,9 @@ namespace strateam{
                 return *axises_[ axis ];
             }
 
+            ControlBoardInterface& controlBoard()override{
+                return *controlBoard_;
+            }
         private:
             static const rj::Value& sureConfig( rj::Value const& config, rj::Pointer const& path ){
               static const rapidjson::Value _EmptyValue_;
@@ -65,8 +81,9 @@ namespace strateam{
           }
 
         private:
-            Transport   transport_;
-            Axises      axises_;
+            Transport       transport_;
+            Axises          axises_;
+            ControlBoardPtr controlBoard_;
         };
     }
 }

@@ -3,6 +3,9 @@
 #include "TransportSelector.hpp"
 #include "AxisSelector.hpp"
 #include "eq-common/Converter.hpp"
+#include "Symbols.hpp"
+#include "spdlog/spdlog.h"
+
 // boost
 #include "Global.hpp"
 
@@ -47,7 +50,6 @@ namespace strateam{
                 dim::MotorStepVelocity vMS = dim::DimensionConverter<dim::MotorStepVelocity>::apply( speed, stepsPerUm_ );
                 auto response = transport_.sendRequestGetResponse( AxisImpl::move( dist, vMS.value() ) );
                 MotionResult motret = AxisImpl::handleRespondCommandGo( response.getSource() );
-                std::cout << "ret: " << motret.str() << std::endl;
                 handleMotionResult(motret);
                 return motret;
             }
@@ -132,25 +134,23 @@ namespace strateam{
 
             void handleMotionResult( MotionResult result ){
                 if( result ){
-                    std::cout << "22222 result: " << result.str() << std::endl;
                     if( result == MotionResult::Success || result == MotionResult::Accepted)
                         startPeriodicalRequestMotionIsDone();
                     else if( result == MotionResult::AlreadyInPosition )
                         f_ = {};
                 }else{
-                    std::cout << "olololo: " << result.str() << std::endl;
                     f_ = {};
                 }
             }
 
             void isMotionDonePeriodicalCallback( boost::system::error_code err ){
-                std::cout << __func__ << std::endl;
+                spdlog::get( Symbols::Console() )->debug( "isMotionDonePeriodicalCallback");
                 using boost::system::error_code;
-                std::cout << err.message() << std::endl;
+
                 if(!err){
                     try{
                         auto retval = isMoving();
-                        std::cout << "retval: " << retval << std::endl;
+                        spdlog::get( Symbols::Console() )->debug( "retval {}", retval);
 
                         if( retval ){  
                             auto waitingForMotionDoneDuration = std::chrono::system_clock::now() - beginWaitingTimePoint_;
@@ -170,20 +170,20 @@ namespace strateam{
                             }
                         }else{ //
                             isMotionDoneTimer_.cancel();
-                            f_( MotionResult::Success );
+                            
+                            if( f_ )
+                                f_( MotionResult::Success );
+                          
                             f_ = {};    
                         }
                     }catch(std::exception const& ex){
-                        std::cout << "poll err: " << ex.what() << std::endl;
+                        spdlog::get( Symbols::Console() )->debug( "poll err {}", ex.what());
                         f_(MotionResult::FAILED);
                         f_ = {};
                         stop();
                     }
                 }
-                // else{  // if canceled, expected this is done from stop()
-                //     f_( MotionResult::Stopped );
-                //     f_ = {};
-                // }
+            
             }
         private:
             IoCtx&                      ctx_;
