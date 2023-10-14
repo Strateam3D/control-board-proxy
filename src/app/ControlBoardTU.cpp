@@ -1,6 +1,8 @@
 #include "ControlBoardTU.hpp"
 #include "equipment/makeEquipment.hpp"
 #include "Dialog.hpp"
+#include "Symbols.hpp"
+#include "spdlog/spdlog.h"
 #include "eq-common/rjapi/Settings.hpp"
 
 //eq-common
@@ -15,6 +17,7 @@
 #include <rapidjson/document.h>
 #include "rapidjson/error/en.h"
 #include "rapidjson/pointer.h"
+
 #include "rj/include/rapidjson/stringbuffer.h"
 #include "rj/include/rapidjson/writer.h"
 #include "rjapi/Helper.hpp"
@@ -213,8 +216,10 @@ void ControlBoardTU::visit( ApplicationMessage& msg ){
             dialogs_[ dialogId ]->dispatch( doc );
         }else{
             auto dialogPtr = std::make_shared< Dialog >( *this, equipment_, dialogId, MasterNcdJsonDom );
+            auto motret = dialogPtr->dispatch( doc );
+            spdlog::get( Symbols::Console() )->debug( "dispatch resp {}", motret.str() );
             
-            if( dialogPtr->dispatch( doc ) == equipment::MotionResult::Accepted ){
+            if( motret == equipment::MotionResult::Accepted ){
                 dialogs_[ dialogId ] = dialogPtr;
             }
         }

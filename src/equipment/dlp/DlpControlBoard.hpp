@@ -38,7 +38,7 @@ namespace strateam{
 
                 rj::Document sendLogsToUart( bool value ){
                     rj::Document req(rj::kObjectType);
-                    rj::SetValueByPointer( req, "/load_cell/setZero", value );
+                    rj::SetValueByPointer( req, "/load_cell/sendToUart", value );
                     return req;
                 }
 

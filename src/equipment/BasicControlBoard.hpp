@@ -156,6 +156,8 @@ namespace strateam{
                             
                             if( f_ )
                                 f_( MotionResult::Success );
+                            else
+                                spdlog::get( Symbols::Console() )->warn( "no callback provided {}", retval );
                           
                             f_ = {};    
                         }

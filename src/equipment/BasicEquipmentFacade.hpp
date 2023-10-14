@@ -48,11 +48,17 @@ namespace strateam{
                 }
 
                 auto const* haydonStepsPerUmValue = rj::GetValueByPointer( config, "/axises/3/stepsPerUm" );
+                double hvMS = haydonStepsPerUmValue->GetDouble();
+                
                 auto const* beamStepsPerUmValue = rj::GetValueByPointer( config, "/axises/0/stepsPerUm" );
-                auto const* kLeft = rj::GetValueByPointer( config, "/equipment/load_cell/kLeft" );
-                auto const* kRight = rj::GetValueByPointer( config, "/equipment/load_cell/kRight" );
-                controlBoard_ = std::make_unique< ControlBoard >( ctx, transport_, haydonStepsPerUmValue->GetDouble(), beamStepsPerUmValue->GetDouble() );
-                auto retval = controlBoard_->setLoadCellCoeffs( kLeft->GetDouble(), kRight->GetDouble() );
+                double bMS = beamStepsPerUmValue->GetDouble();
+                
+                controlBoard_ = std::make_unique< ControlBoard >( ctx, transport_, hvMS, bMS );
+                auto const* kLeft = rj::GetValueByPointer( config, "/load_cell/lk" );
+                auto const* kRight = rj::GetValueByPointer( config, "/load_cell/rk" );
+                double lk = kLeft->GetDouble();
+                double rk = kRight->GetDouble();
+                auto retval = controlBoard_->setLoadCellCoeffs( lk, rk );
 
                 if( retval != decltype(retval)::Success ){
                     throw Exception( "Failed to set laod cell coefficients" );

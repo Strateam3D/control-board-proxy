@@ -812,8 +812,8 @@ Dialog::Dialog( ControlBoardTU& tu, equipment::EquipmentInterface& eq, std::stri
                     dim::MilliSecond  sdt( v["sdt"].GetInt() );
                     dim::UmVelocity  hv( v["hv"].GetInt() );
                     dim::UmVelocity  bv( v["bv"].GetInt() );
-                    auto retval = equipment_.controlBoard().squeeze( msv, sdf, sdt, hv, bv );
-                    return retval.success() ? ResponseCode::Success : ResponseCode::Failed;
+                    motret_ = equipment_.controlBoard().squeeze( msv, sdf, sdt, hv, bv );
+                    return motret_ ? ResponseCode::Accepted : ResponseCode::Failed;
                 }catch( std::exception const& ex ){
                     spdlog::get( Symbols::Console() )->error( "sendToUart err {}", ex.what() );
                     return ResponseCode::Failed;
@@ -866,7 +866,8 @@ equipment::MotionResult Dialog::dispatch( DocumentPtr docPtr ){
     docPtr->Accept( saxHandler );
     std::string rspTopic = dialogId_ + "/rsp";
     rj::StringBuffer buffer = StringifyRjValue( *response );
-    std::cout << "Outgoing response:\n" << "rspTopic:" << rspTopic << "\nbody: " << buffer.GetString();
+    
+    spdlog::get( Symbols::Console() )->debug( "Outgoing response:\n{}\nbody: {}", rspTopic, buffer.GetString() );
     mqtt::message_ptr rsp = mqtt::make_message( rspTopic, buffer.GetString() );
     tu_.publish( rsp );
     return motret_;
