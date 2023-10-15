@@ -7,7 +7,7 @@ import time
 from paho.mqtt import client as mqtt_client
 
 
-broker = '127.0.0.1'
+broker = '192.168.2.107'
 port = 1883
 topic="/strateam/pyclient-tool/control-board"
 rsp_topic="/strateam/pyclient-tool/control-board/rsp"
@@ -37,20 +37,67 @@ def connect_mqtt():
     client = mqtt_client.Client(client_id)
     # client.username_pw_set(username, password)
     client.on_connect = on_connect
+    print(f"connecting to`{broker}` : `{port}`")
     client.connect(broker, port)
     return client
 
+        # rj::SetValueByPointer( req2, "/load_cell/monitor/squeeze/msv", 100 );
+        # rj::SetValueByPointer( req2, "/load_cell/monitor/squeeze/sdf", 25000 );
+        # rj::SetValueByPointer( req2, "/load_cell/monitor/squeeze/sdt", 500 );
+        # rj::SetValueByPointer( req2, "/load_cell/monitor/squeeze/hv", 500 );
+        # rj::SetValueByPointer( req2, "/load_cell/monitor/squeeze/bv", 500 );
 
 def publish(client):
     
+    # payload = """
+    # {
+    #     "equipment": {
+    #         "controlBoard" : {
+    #             "squeeze" : {
+    #                 "msv" : 100,
+    #                 "sdf" : 5000,
+    #                 "sdt" : 1000,
+    #                 "hv" : 500,
+    #                 "bv" : 500
+    #             }
+    #         }
+    #     }
+    # }"""
+    # payload = """
+    # {
+    #     "equipment": {
+    #         "controlBoard" : {
+    #             "sendToUart" : true
+    #         }
+    #     }
+    # }"""
+    # payload = """
+    
+    # {
+    #     "equipment": {
+    #         "controlBoard" : {
+    #             "setZero" : true
+    #         }
+    #     }
+    # }"""
+
+    # payload = """
+    # {
+    #     "equipment": {
+    #         "controlBoard" : {
+    #             "stop" : true
+    #         }
+    #     }
+    # }"""
+
     payload = """
     {
         "equipment": {
             "axis" : {
-                "beam" : {
-                    "move": {
-                        "offset" : 2000,
-                        "spd" : 1000
+                "z" : {
+                    "move" : {
+                        "offset" : 4000,
+                        "spd" : 2000
                     }
                 }
             }

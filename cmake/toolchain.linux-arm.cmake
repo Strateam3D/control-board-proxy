@@ -15,7 +15,7 @@ SET(CMAKE_CXX_COMPILER "${CROSSTOOL_ROOT}/bin/arm-linux-gnueabihf-g++")
 SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,-rpath-link,/home/kyb/raspbian/sysroot/lib/arm-linux-gnueabihf")
 SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,-rpath-link,/home/kyb/raspbian/sysroot/usr/lib/arm-linux-gnueabihf")
 SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,-rpath-link,/home/kyb/raspbian/sysroot/opt/vc/lib")
-SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -fsanitize=address" )
+# SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -fsanitize=address" )
 
 set(CMAKE_C_FLAGS "${CMAKE_CXX_FLAGS} --sysroot=\"${CMAKE_SYSROOT}\"")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --sysroot=\"${CMAKE_SYSROOT}\"")

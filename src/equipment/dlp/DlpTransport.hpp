@@ -61,6 +61,7 @@ namespace strateam{
                     std::vector<char> ba(prefix.begin(), prefix.end());
                     ba.insert( ba.end(),  msg.data(), msg.data() + msg.size() );
                     ba.insert( ba.end(), suffix.begin(), suffix.end() );
+                    ba.push_back( '\0' );
                     spdlog::get( Symbols::Console() )->debug( "request {}", ba.data());
                     
                     return sendRawRequestGetResponse( ba );;
@@ -71,9 +72,13 @@ namespace strateam{
                     serialPort_.write( ba );
                     
                     if( cv_.wait_for( _, std::chrono::milliseconds( 5000 ) ) == std::cv_status::no_timeout ){
-                        auto resp = std::move( ba_ );
-                        assert( ba_.empty() );
-                        spdlog::get( Symbols::Console() )->debug( "response {}", resp.empty() ? "EMPTY" : resp.data());
+                        // spdlog::get( Symbols::Console() )->debug( "response {}, size: {}", resp.empty() ? "EMPTY" : resp.data(), resp.size());
+                        std::vector<char> resp( ba_.begin(), ba_.end() );
+                        ba_.clear();
+                        // assert( ba_.empty() );
+                        resp.push_back( '\0' );
+                        spdlog::get( Symbols::Console() )->debug( "response {}, size: {}", resp.empty() ? "EMPTY" : resp.data(), resp.size());
+
                         return MessageWrapper::fromData( resp.data() ).decode();
                     }else{
                         spdlog::get( Symbols::Console() )->debug( "timeout for req {}", ba.data());
@@ -108,15 +113,21 @@ namespace strateam{
                     int btc;  // bytes to chop (cut from the end)
                     bool promtInvitationFound = findResponseTerminator( respond, btc ); 
                     
-                    if( promtInvitationFound )
-                        respond.erase( respond.begin() + btc, respond.end() );
+                    if( promtInvitationFound ){
+                        // spdlog::get( Symbols::Console() )->debug( "ba: {}, sz: {}, btc: {}", respond.data(), respond.size(), btc );
+                        respond.erase( respond.begin() + respond.size() - btc, respond.end() );
+                    }
+                        
                     
                     return promtInvitationFound;
                 }
 
                 void asyncHandleRead( const char* data, std::size_t len ){
                     std::unique_lock<std::mutex>_( mtx_ );
+                    std::string dbgStr( data, len );
+                    
                     ba_.insert( ba_.end(), data, data + len );               
+                    // spdlog::get( Symbols::Console() )->debug( "dbgStr size: {} ba size: {}", dbgStr.size(), ba_.size());
                     bool promtInvitationFound = findResponseTerminatorAndChop( ba_ );
                     
                     if( promtInvitationFound ){
@@ -153,7 +164,8 @@ namespace strateam{
                     std::unique_lock<std::mutex> _( mtx_ );
                     
                     if( cv_.wait_for( _, std::chrono::milliseconds( 500 ) ) == std::cv_status::no_timeout ){
-                        auto resp = std::move( ba_ );
+                        std::vector<char> resp = ba_;
+                        ba_.clear();
                         assert( ba_.empty() );
                         spdlog::get( Symbols::Console() )->debug( "readAll: {}", resp.data() );
                     }else{
