@@ -126,9 +126,30 @@ namespace strateam{
                     params.AddMember("accel", accel, al);  //Q_UNUSED(accel);//
                     params.AddMember("decel", decel, al);  //Q_UNUSED(decel);//
                     params.AddMember("goZero",true,al);
-                    params.AddMember("go",rj::kNullType,al);
                     req.AddMember( rj::Value( axisName_, al ), params, al );
                     return req;
+                }
+
+                MotionResult handleRespondCommandGoZero( rj::Document const& doc ){
+                    auto const* val = rj::GetValueByPointer( doc, rj::Pointer( ( pointerName_ + "/goZero" ).c_str() ) );
+
+                    if( !val ){
+                        throw Exception( "Invalid go response" );
+                    }
+
+                    if( val->IsString() ){
+                        std::string rsp = val->GetString();
+
+                        if( rsp.find( "Already in the targetPosition" ) != std::string::npos || rsp.find( "AlreadyInPosition" ) != std::string::npos ){
+                            // std::cout << "aaaaaaaaaa AlreadyInPosition\n";
+                            return MotionResult::AlreadyInPosition;
+                        }else{
+                            // std::cout << __func__ << "ERR: " << rsp << std::endl;
+                            return MotionResult::FAILED;
+                        }
+                    }
+
+                    return val->GetBool() ? MotionResult::Accepted : MotionResult::FAILED;
                 }
 
                 rj::Document stop(){

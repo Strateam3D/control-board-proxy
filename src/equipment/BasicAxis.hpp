@@ -85,7 +85,7 @@ namespace strateam{
                 dim::MotorStepVelocity vMS = dim::DimensionConverter<dim::MotorStepVelocity>::apply( speed, stepsPerUm_ );
                 f_ = [this]( MotionResult ret ){ notify( &ListenerInterface::moveToZeroDone, ret ); };
                 auto response = transport_.sendRequestGetResponse( AxisImpl::moveZero( vMS.value() ) );
-                MotionResult motret = AxisImpl::handleRespondCommandGo( response.getSource() );
+                MotionResult motret = AxisImpl::handleRespondCommandGoZero( response.getSource() );
                 handleMotionResult(motret);
                 return motret;
             }

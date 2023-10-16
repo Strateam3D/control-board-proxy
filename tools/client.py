@@ -7,7 +7,7 @@ import time
 from paho.mqtt import client as mqtt_client
 
 
-broker = '192.168.2.107'
+broker = 'localhost'
 port = 1883
 topic="/strateam/pyclient-tool/control-board"
 rsp_topic="/strateam/pyclient-tool/control-board/rsp"
@@ -94,10 +94,10 @@ def publish(client):
     {
         "equipment": {
             "axis" : {
-                "z" : {
+                "beam" : {
                     "move" : {
-                        "offset" : 4000,
-                        "spd" : 2000
+                        "spd" : 1000,
+                        "offset" : 5000
                     }
                 }
             }
