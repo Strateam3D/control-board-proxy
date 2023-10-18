@@ -95,9 +95,8 @@ def publish(client):
         "equipment": {
             "axis" : {
                 "beam" : {
-                    "move" : {
-                        "spd" : 1000,
-                        "offset" : 5000
+                    "moveToZero" : {
+                        "spd" : 1000
                     }
                 }
             }

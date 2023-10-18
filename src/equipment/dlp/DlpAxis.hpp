@@ -84,7 +84,7 @@ namespace strateam{
                     auto const* val = rj::GetValueByPointer( doc, rj::Pointer( ( pointerName_ + "/go" ).c_str() ) );
 
                     if( !val ){
-                        throw Exception( "Invalid go response" );
+                        return MotionResult::FAILED;
                     }
 
                     if( val->IsString() ){
@@ -134,7 +134,7 @@ namespace strateam{
                     auto const* val = rj::GetValueByPointer( doc, rj::Pointer( ( pointerName_ + "/goZero" ).c_str() ) );
 
                     if( !val ){
-                        throw Exception( "Invalid go response" );
+                        return MotionResult::FAILED;
                     }
 
                     if( val->IsString() ){
