@@ -11,6 +11,7 @@
                     "homePos": -50000,
                     "stepsPerUm" : 0.8,
                     "msPerInch"  : 20298
+
                 },
                 {
                     "name": "motor2",
@@ -22,7 +23,8 @@
                     "name": "motor3",
                     "homePos": -50000,
                     "stepsPerUm" : 0.8,
-                    "msPerInch"  : 20298
+                    "msPerInch"  : 20298,
+                    "inverted" : true
                 },
                 {
                     "name": "h1",

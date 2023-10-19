@@ -21,11 +21,12 @@ namespace strateam{
             using AxisImpl = typename AxisSelector<TagT>::type;
             using F = std::function<void(MotionResult)>;
         public:// == ctor ==
-            BasicAxis( IoCtx& ctx, std::string const& axisName, Transport& t, const double stepsPerUm ) 
+            BasicAxis( IoCtx& ctx, std::string const& axisName, Transport& t, const double stepsPerUm, bool inverted ) 
             : AxisImpl( axisName )
             , ctx_( ctx )
             , transport_( t )
             , stepsPerUm_( stepsPerUm )
+            , inverted_( inverted )
             {}
 
             BasicAxis( AxisImpl const& ) = delete;
@@ -43,7 +44,7 @@ namespace strateam{
                     return MotionResult::AlreadyMoving;
 
                 f_ = [this]( MotionResult ret ){ notify( &ListenerInterface::motionDone, ret ); };
-                dim::MotorStep offMs = dim::DimensionConverter<dim::MotorStep>::apply( offset, stepsPerUm_ );
+                dim::MotorStep offMs = dim::DimensionConverter<dim::MotorStep>::apply( inverted_ ? offset.neg() : offset, stepsPerUm_ );
                 dim::MotorStep dExposureDistance = offMs + stepResidual_;
                 dim::MotorStep dist{0.0};
                 stepResidual_ = ModF( dExposureDistance, dist );
@@ -58,7 +59,7 @@ namespace strateam{
                 if( f_ )
                     return MotionResult::AlreadyMoving;
 
-                dim::MotorStep tarMs = dim::DimensionConverter<dim::MotorStep>::apply( target, stepsPerUm_ );
+                dim::MotorStep tarMs = dim::DimensionConverter<dim::MotorStep>::apply( inverted_ ? target.neg() : target, stepsPerUm_ );
                 dim::MotorStepVelocity vMS = dim::DimensionConverter<dim::MotorStepVelocity>::apply( speed, stepsPerUm_ );
                 f_ = [this]( MotionResult ret ){ notify( &ListenerInterface::motionDone, ret ); };
                 auto response = transport_.sendRequestGetResponse( AxisImpl::moveTo( tarMs, vMS.value() ) );
@@ -72,7 +73,7 @@ namespace strateam{
                     return MotionResult::AlreadyMoving;
 
                 f_ = [this]( MotionResult ret ){ notify( &ListenerInterface::motionDone, ret ); };
-                auto response = transport_.sendRequestGetResponse( AxisImpl::moveTo( target, speed ) );
+                auto response = transport_.sendRequestGetResponse( AxisImpl::moveTo( inverted_ ? target.neg() : target, speed ) );
                 MotionResult motret = AxisImpl::handleRespondCommandGo( response.getSource() );
                 handleMotionResult(motret);
                 return motret;
@@ -109,7 +110,7 @@ namespace strateam{
                 auto resp = transport_.sendRequestGetResponse( AxisImpl::position() );
                 dim::MotorStep posMS = AxisImpl::template into<dim::MotorStep>( resp.getSource() );
                 dim::Um posUM = dim::DimensionConverter<dim::Um> :: apply( posMS, stepsPerUm_ );
-                return posUM;
+                return inverted_ ? posUM.neg() : posUM;
             }
 
             virtual dim::Um homePosition() override{
@@ -200,6 +201,7 @@ namespace strateam{
             milliseconds waitForMotionDoneMaxDuration_ { 300000 };
 
             dim::MotorStep                  stepResidual_{0.0};
+            bool inverted_{ false };
         };
     }
 }

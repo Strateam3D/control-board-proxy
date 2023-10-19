@@ -142,6 +142,7 @@ constexpr const char* RegistryJsonStr = R"||(
             "setZero" : true,
             "sendToUart" : true,
             "squeeze" : {
+                "targetPos" : 20.4,//[mm]
                 "msv" : 100, // MinSignalValueToDetectGram[gram]
                 "sdf" : 100, // SignalDeltaFGram[gram]
                 "sdt" : 100, // StableTimeDetectionMS;//[ms]

@@ -46,13 +46,15 @@ namespace strateam{
             using milliseconds = std::chrono::milliseconds;
             time_point_milliseconds beginWaitingTimePoint_ = std::chrono::time_point_cast<milliseconds>(std::chrono::system_clock::now());
             milliseconds waitForMotionDoneMaxDuration_ { 300000 };
+            bool inverted_{ false };
 
         public:// == CTOR ==
-            BasicControlBoard( IoCtx& ctx, Transport& t, const double haydonStepsPerUM, const double beamStepsPerUM )
+            BasicControlBoard( IoCtx& ctx, Transport& t, const double haydonStepsPerUM, const double beamStepsPerUM, bool beamInverted )
             : ctx_( ctx )
             , transport_( t )
             , haydonStepsPerUM_( haydonStepsPerUM )
             , beamStepsPerUM_( beamStepsPerUM )
+            , inverted_( beamInverted )
             {}
 
             BasicControlBoard( BasicControlBoard const& ) = delete;
@@ -74,14 +76,16 @@ namespace strateam{
                 return ControlBoardImpl::checkErrors( response.getSource() );
             }
 
-            virtual MotionResult squeeze( dim::Gram const& minSignalValueToDetect, dim::Gram const& signalDeltaF, dim::MilliSecond const& stableTimeDetection, dim::UmVelocity const& haydonVelocity, dim::UmVelocity const& beamVelocity ) override{
+            virtual MotionResult squeeze( dim::Um const& targetPos, dim::Gram const& minSignalValueToDetect, dim::Gram const& signalDeltaF, dim::MilliSecond const& stableTimeDetection, dim::UmVelocity const& haydonVelocity, dim::UmVelocity const& beamVelocity ) override{
                 if( f_ )
                     return MotionResult::AlreadyMoving;
 
                 f_ = [this]( MotionResult ret ){ notify( &ListenerInterface::squeezingDone, ret ); };
+                dim::MotorStep tarMs = dim::DimensionConverter<dim::MotorStep>::apply( inverted_ ? targetPos.neg() : targetPos, haydonStepsPerUM_ );
                 dim::MotorStepVelocity hvMS = dim::DimensionConverter< dim::MotorStepVelocity >::apply( haydonVelocity, haydonStepsPerUM_ );
                 dim::MotorStepVelocity bvMS = dim::DimensionConverter< dim::MotorStepVelocity >::apply( beamVelocity, beamStepsPerUM_ );
                 auto response = transport_.sendRequestGetResponse( ControlBoardImpl::squeeze( 
+                    tarMs.castTo<int>(),
                     minSignalValueToDetect.castTo<int>(), 
                     signalDeltaF.castTo<int>(), 
                     stableTimeDetection.castTo<int>(), 

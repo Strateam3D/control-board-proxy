@@ -42,8 +42,9 @@ namespace strateam{
                     return req;
                 }
 
-                rj::Document squeeze( int minSignalValueToDetect, int signalDeltaF, int stableTimeDetection, int haydonVelocity, int beamVelocity ){
+                rj::Document squeeze( int targetPos, int minSignalValueToDetect, int signalDeltaF, int stableTimeDetection, int haydonVelocity, int beamVelocity ){
                     rj::Document req(rj::kObjectType);
+                    rj::SetValueByPointer( req, "/load_cell/monitor/squeeze/targetPos", targetPos );
                     rj::SetValueByPointer( req, "/load_cell/monitor/squeeze/msv", minSignalValueToDetect );
                     rj::SetValueByPointer( req, "/load_cell/monitor/squeeze/sdf", signalDeltaF );
                     rj::SetValueByPointer( req, "/load_cell/monitor/squeeze/sdt", stableTimeDetection );

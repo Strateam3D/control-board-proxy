@@ -41,8 +41,10 @@ namespace strateam{
                     std::string axisName = axisValue[ "name" ].GetString();
                     std::cout << "Creating axis " << axisName << std::endl;
                     double stepsPerUm = axisValue[ "stepsPerUm" ].GetDouble();
-                    AxisPtr axisPtr = std::make_unique<Axis>( ctx, axisName, transport_, stepsPerUm );
+                    bool inverted = axisValue["inverted"].GetBool();
+                    AxisPtr axisPtr = std::make_unique<Axis>( ctx, axisName, transport_, stepsPerUm, inverted );
                     int hp = axisValue[ "homePos" ].GetInt();
+                    
                     axisPtr->setHomePosition( dim::MotorStep( hp ) );
                     axises_.emplace( static_cast<AxisType>( id ), std::move( axisPtr ) );
                 }
@@ -52,8 +54,11 @@ namespace strateam{
                 
                 auto const* beamStepsPerUmValue = rj::GetValueByPointer( config, "/axises/0/stepsPerUm" );
                 double bMS = beamStepsPerUmValue->GetDouble();
+
+                auto const* beamInvertedValue = rj::GetValueByPointer( config, "/axises/0/inverted" );
+                bool beamInverted = beamInvertedValue->GetBool();
                 
-                controlBoard_ = std::make_unique< ControlBoard >( ctx, transport_, hvMS, bMS );
+                controlBoard_ = std::make_unique< ControlBoard >( ctx, transport_, hvMS, bMS, beamInverted );
                 auto const* kLeft = rj::GetValueByPointer( config, "/load_cell/lk" );
                 auto const* kRight = rj::GetValueByPointer( config, "/load_cell/rk" );
                 double lk = kLeft->GetDouble();

@@ -20,37 +20,43 @@ constexpr const char* DefaultDocumentStr = R"||(
                     "name": "motor1",
                     "homePos": -5000,
                     "stepsPerUm" : 0.8,
-                    "msPerInch"  : 20298
+                    "msPerInch"  : 20298,
+                    "inverted" : false
                 },
                 {
                     "name": "motor2",
                     "homePos": -5000,
                     "stepsPerUm" : 0.8,
-                    "msPerInch"  : 20298
+                    "msPerInch"  : 20298,
+                    "inverted" : false
                 },
                 {
                     "name": "motor3",
                     "homePos": -5000,
                     "stepsPerUm" : 0.8,
-                    "msPerInch"  : 20298
+                    "msPerInch"  : 20298,
+                    "inverted" : false
                 },
                 {
                     "name": "h1",
                     "homePos": -5000,
                     "stepsPerUm" : 0.8,
-                    "msPerInch"  : 20298
+                    "msPerInch"  : 20298,
+                    "inverted" : false
                 },
                 {
                     "name": "h2",
                     "homePos": -5000,
                     "stepsPerUm" : 0.8,
-                    "msPerInch"  : 20298
+                    "msPerInch"  : 20298,
+                    "inverted" : false
                 },
                 {
                     "name": "beam",
                     "homePos": -5000,
                     "stepsPerUm" : 0.8,
-                    "msPerInch"  : 20298
+                    "msPerInch"  : 20298,
+                    "inverted" : false
                 }
             ],
             "load_cell" : {
