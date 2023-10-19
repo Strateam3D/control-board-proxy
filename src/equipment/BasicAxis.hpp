@@ -104,6 +104,7 @@ namespace strateam{
             virtual void stop() override{
                 isMotionDoneTimer_.cancel();
                 transport_.sendRequestGetResponse( AxisImpl::stop() );
+                f_ = {};
             }
 
             virtual dim::Um position() override{

@@ -810,8 +810,8 @@ Dialog::Dialog( ControlBoardTU& tu, equipment::EquipmentInterface& eq, std::stri
                     dim::Gram  msv( v["msv"].GetInt() );
                     dim::Gram  sdf( v["sdf"].GetInt() );
                     dim::MilliSecond  sdt( v["sdt"].GetInt() );
-                    dim::UmVelocity  hv( v["hv"].GetInt() * 1000 );
-                    dim::UmVelocity  bv( v["bv"].GetInt() * 1000 );
+                    dim::UmVelocity  hv( v["hv"].GetDouble() * 1000 );
+                    dim::UmVelocity  bv( v["bv"].GetDouble() * 1000 );
                     dim::Um targetPos( v["targetPos"].GetDouble() * 1000 );
                     motret_ = equipment_.controlBoard().squeeze(targetPos, msv, sdf, sdt, hv, bv );
                     return motret_ ? ResponseCode::Accepted : ResponseCode::Failed;

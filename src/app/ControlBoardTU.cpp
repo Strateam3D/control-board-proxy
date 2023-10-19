@@ -146,8 +146,8 @@ constexpr const char* RegistryJsonStr = R"||(
                 "msv" : 100, // MinSignalValueToDetectGram[gram]
                 "sdf" : 100, // SignalDeltaFGram[gram]
                 "sdt" : 100, // StableTimeDetectionMS;//[ms]
-                "hv" : 200,	// haydon velocity[steps/s]
-                "bv" : 200, // beam velocity[steps/s]
+                "hv" : 200.0,	// haydon velocity[mm/s]
+                "bv" : 200.0, // beam velocity[mm/s]
                 "go" : true
             },
             "stop" : true

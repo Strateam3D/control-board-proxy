@@ -41,7 +41,7 @@ namespace strateam{
                     std::string axisName = axisValue[ "name" ].GetString();
                     std::cout << "Creating axis " << axisName << std::endl;
                     double stepsPerUm = axisValue[ "stepsPerUm" ].GetDouble();
-                    bool inverted = axisValue["inverted"].GetBool();
+                    bool inverted = axisValue.HasMember( "inverted" ) && axisValue["inverted"].GetBool();
                     AxisPtr axisPtr = std::make_unique<Axis>( ctx, axisName, transport_, stepsPerUm, inverted );
                     int hp = axisValue[ "homePos" ].GetInt();
                     
@@ -52,10 +52,10 @@ namespace strateam{
                 auto const* haydonStepsPerUmValue = rj::GetValueByPointer( config, "/axises/3/stepsPerUm" );
                 double hvMS = haydonStepsPerUmValue->GetDouble();
                 
-                auto const* beamStepsPerUmValue = rj::GetValueByPointer( config, "/axises/0/stepsPerUm" );
+                auto const* beamStepsPerUmValue = rj::GetValueByPointer( config, "/axises/5/stepsPerUm" );
                 double bMS = beamStepsPerUmValue->GetDouble();
 
-                auto const* beamInvertedValue = rj::GetValueByPointer( config, "/axises/0/inverted" );
+                auto const* beamInvertedValue = rj::GetValueByPointer( config, "/axises/5/inverted" );
                 bool beamInverted = beamInvertedValue->GetBool();
                 
                 controlBoard_ = std::make_unique< ControlBoard >( ctx, transport_, hvMS, bMS, beamInverted );

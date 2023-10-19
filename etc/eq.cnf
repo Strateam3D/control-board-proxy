@@ -23,26 +23,28 @@
                     "name": "motor3",
                     "homePos": -50000,
                     "stepsPerUm" : 0.8,
-                    "msPerInch"  : 20298,
-                    "inverted" : true
+                    "msPerInch"  : 20298
                 },
                 {
                     "name": "h1",
                     "homePos": -50000,
                     "stepsPerUm" : 0.8,
-                    "msPerInch"  : 20298
+                    "msPerInch"  : 20298,
+                    "inverted" : true
                 },
                 {
                     "name": "h2",
                     "homePos": -50000,
                     "stepsPerUm" : 0.8,
-                    "msPerInch"  : 20298
+                    "msPerInch"  : 20298,
+                    "inverted" : true
                 },
                 {
                     "name": "beam",
                     "homePos": -5000,
                     "stepsPerUm" : 0.8,
-                    "msPerInch"  : 20298
+                    "msPerInch"  : 20298,
+                    "inverted" : true
                 }
             ],
             "load_cell" : {

@@ -103,8 +103,48 @@ def publish(client):
         }
     }"""
 
+    payload_get_z_pos = """
+    {
+        "equipment": {
+            "axis" : {
+                "z" : {
+                    "position" : null
+                }
+            }
+        }
+    }"""
+
+
+    payload_get_beam_pos = """
+    {
+        "equipment": {
+            "axis" : {
+                "beam" : {
+                    "position" : null
+                }
+            }
+        }
+    }"""
+
+    payload_squeeze = """
+    {
+        "equipment": {
+            "controlBoard" : {
+                "squeeze" : {
+                    "targetPos" : 1.0,
+                    "msv" : 100,
+                    "sdf" : 5000,
+                    "sdt" : 1000,
+                    "hv" : 0.5,
+                    "bv" : 0.5
+                }
+            }
+        }
+    }"""
+    
+
     time.sleep(1)
-    msg = payload
+    msg = payload_squeeze
     result = client.publish(topic, msg)
     # result: [0, 1]
     status = result[0]
