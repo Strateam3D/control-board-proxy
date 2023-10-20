@@ -81,7 +81,7 @@ namespace strateam{
                     return MotionResult::AlreadyMoving;
 
                 f_ = [this]( MotionResult ret ){ notify( &ListenerInterface::squeezingDone, ret ); };
-                dim::MotorStep tarMs = dim::DimensionConverter<dim::MotorStep>::apply( inverted_ ? targetPos.neg() : targetPos, haydonStepsPerUM_ );
+                dim::MotorStep tarMs = dim::DimensionConverter<dim::MotorStep>::apply( inverted_ ? targetPos.neg() : targetPos, beamStepsPerUM_ );
                 dim::MotorStepVelocity hvMS = dim::DimensionConverter< dim::MotorStepVelocity >::apply( haydonVelocity, haydonStepsPerUM_ );
                 dim::MotorStepVelocity bvMS = dim::DimensionConverter< dim::MotorStepVelocity >::apply( beamVelocity, beamStepsPerUM_ );
                 auto response = transport_.sendRequestGetResponse( ControlBoardImpl::squeeze( 

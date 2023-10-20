@@ -22,7 +22,7 @@
                 {
                     "name": "motor3",
                     "homePos": -50000,
-                    "stepsPerUm" : 0.8,
+                    "stepsPerUm" : 0.12598425196,
                     "msPerInch"  : 20298
                 },
                 {
@@ -42,7 +42,7 @@
                 {
                     "name": "beam",
                     "homePos": -5000,
-                    "stepsPerUm" : 0.8,
+                    "stepsPerUm" : 0.06299212,
                     "msPerInch"  : 20298,
                     "inverted" : true
                 }
