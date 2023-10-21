@@ -142,12 +142,11 @@ constexpr const char* RegistryJsonStr = R"||(
             "setZero" : true,
             "sendToUart" : true,
             "squeeze" : {
-                "targetPos" : 20.4,//[mm]
-                "msv" : 100, // MinSignalValueToDetectGram[gram]
-                "sdf" : 100, // SignalDeltaFGram[gram]
-                "sdt" : 100, // StableTimeDetectionMS;//[ms]
-                "hv" : 200.0,	// haydon velocity[mm/s]
+                "hnum" : 1,
+                "bOffset" : 20.4,//[mm]
                 "bv" : 200.0, // beam velocity[mm/s]
+                "hOffset" : 20.4,//[mm]
+                "hv" : 200.0,	// haydon velocity[mm/s]
                 "go" : true
             },
             "stop" : true

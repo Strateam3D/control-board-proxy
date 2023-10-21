@@ -42,14 +42,13 @@ namespace strateam{
                     return req;
                 }
 
-                rj::Document squeeze( int targetPos, int minSignalValueToDetect, int signalDeltaF, int stableTimeDetection, int haydonVelocity, int beamVelocity ){
+                rj::Document squeeze( int hnum, int beamOffset, int beamVelocity, int haydonOffset, int haydonVelocity ){
                     rj::Document req(rj::kObjectType);
-                    rj::SetValueByPointer( req, "/load_cell/monitor/squeeze/targetPos", targetPos );
-                    rj::SetValueByPointer( req, "/load_cell/monitor/squeeze/msv", minSignalValueToDetect );
-                    rj::SetValueByPointer( req, "/load_cell/monitor/squeeze/sdf", signalDeltaF );
-                    rj::SetValueByPointer( req, "/load_cell/monitor/squeeze/sdt", stableTimeDetection );
-                    rj::SetValueByPointer( req, "/load_cell/monitor/squeeze/hv", haydonVelocity );
+                    rj::SetValueByPointer( req, "/load_cell/monitor/squeeze/hnum", hnum );
+                    rj::SetValueByPointer( req, "/load_cell/monitor/squeeze/bOffset", beamOffset );
                     rj::SetValueByPointer( req, "/load_cell/monitor/squeeze/bv", beamVelocity );
+                    rj::SetValueByPointer( req, "/load_cell/monitor/squeeze/hOffset", haydonOffset );
+                    rj::SetValueByPointer( req, "/load_cell/monitor/squeeze/hv", haydonVelocity );
                     rj::SetValueByPointer( req, "/load_cell/monitor/squeeze/go", true );
                     return req;
                 }

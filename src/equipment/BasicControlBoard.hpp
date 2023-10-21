@@ -76,21 +76,26 @@ namespace strateam{
                 return ControlBoardImpl::checkErrors( response.getSource() );
             }
 
-            virtual MotionResult squeeze( dim::Um const& targetPos, dim::Gram const& minSignalValueToDetect, dim::Gram const& signalDeltaF, dim::MilliSecond const& stableTimeDetection, dim::UmVelocity const& haydonVelocity, dim::UmVelocity const& beamVelocity ) override{
+            virtual MotionResult squeeze( int hnum
+                , dim::Um const& beamOffset
+                , dim::UmVelocity const& beamVelocity 
+                , dim::Um const& haydonOffset
+                , dim::UmVelocity const& haydonVelocity ) override{
                 if( f_ )
                     return MotionResult::AlreadyMoving;
 
                 f_ = [this]( MotionResult ret ){ notify( &ListenerInterface::squeezingDone, ret ); };
-                dim::MotorStep tarMs = dim::DimensionConverter<dim::MotorStep>::apply( inverted_ ? targetPos.neg() : targetPos, beamStepsPerUM_ );
-                dim::MotorStepVelocity hvMS = dim::DimensionConverter< dim::MotorStepVelocity >::apply( haydonVelocity, haydonStepsPerUM_ );
+                dim::MotorStep beamOffsetMs = dim::DimensionConverter<dim::MotorStep>::apply( inverted_ ? beamOffset.neg() : beamOffset, beamStepsPerUM_ );
                 dim::MotorStepVelocity bvMS = dim::DimensionConverter< dim::MotorStepVelocity >::apply( beamVelocity, beamStepsPerUM_ );
+                dim::MotorStep haydonOffsetMs = dim::DimensionConverter<dim::MotorStep>::apply( inverted_ ? haydonOffset.neg() : haydonOffset, haydonStepsPerUM_ );
+                dim::MotorStepVelocity hvMS = dim::DimensionConverter< dim::MotorStepVelocity >::apply( haydonVelocity, haydonStepsPerUM_ );
+                
                 auto response = transport_.sendRequestGetResponse( ControlBoardImpl::squeeze( 
-                    tarMs.castTo<int>(),
-                    minSignalValueToDetect.castTo<int>(), 
-                    signalDeltaF.castTo<int>(), 
-                    stableTimeDetection.castTo<int>(), 
-                    hvMS.castTo<int>(), 
-                    bvMS.castTo<int>() ) 
+                    hnum,
+                    beamOffsetMs.castTo<int>(),
+                    bvMS.castTo<int>(),
+                    haydonOffsetMs.castTo<int>(),
+                    hvMS.castTo<int>()) 
                 );
                 MotionResult motret = ControlBoardImpl::handleRespondCommandGo( response.getSource() );
                 handleMotionResult(motret);

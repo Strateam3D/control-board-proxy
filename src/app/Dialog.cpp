@@ -807,13 +807,13 @@ Dialog::Dialog( ControlBoardTU& tu, equipment::EquipmentInterface& eq, std::stri
             /*get*/nullptr,
             /*set*/[ this ]( rj::Value& v ) -> ResponseCode{
                 try{
-                    dim::Gram  msv( v["msv"].GetInt() );
-                    dim::Gram  sdf( v["sdf"].GetInt() );
-                    dim::MilliSecond  sdt( v["sdt"].GetInt() );
-                    dim::UmVelocity  hv( v["hv"].GetDouble() * 1000 );
+                    int hnum = v["hnum"].GetInt();
+                    dim::Um beamOffset( v["bOffset"].GetDouble() * 1000 );
                     dim::UmVelocity  bv( v["bv"].GetDouble() * 1000 );
-                    dim::Um targetPos( v["targetPos"].GetDouble() * 1000 );
-                    motret_ = equipment_.controlBoard().squeeze(targetPos, msv, sdf, sdt, hv, bv );
+                    dim::Um hOffset( v["hOffset"].GetDouble() * 1000 );
+                    dim::UmVelocity  hv( v["hv"].GetDouble() * 1000 );
+            
+                    motret_ = equipment_.controlBoard().squeeze( hnum, beamOffset, bv, hOffset, hv );
                     return motret_ ? ResponseCode::Accepted : ResponseCode::Failed;
                 }catch( std::exception const& ex ){
                     spdlog::get( Symbols::Console() )->error( "sendToUart err {}", ex.what() );
