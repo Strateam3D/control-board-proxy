@@ -58,11 +58,7 @@ constexpr const char* DefaultDocumentStr = R"||(
                     "msPerInch"  : 20298,
                     "inverted" : false
                 }
-            ],
-            "load_cell" : {
-                "lk" : 26.38,
-                "rk" : 26.38
-            }
+            ]
     },
     "mqtt" : {
         "address" : "tcp://localhost:1883",
