@@ -57,8 +57,11 @@ namespace strateam{
 
                 auto const* beamInvertedValue = rj::GetValueByPointer( config, "/axises/5/inverted" );
                 bool beamInverted = beamInvertedValue->GetBool();
+                auto& beamAxis = *axises_[ AxisType::beam ];
+                auto& h1Axis = *axises_[ AxisType::H1 ];
+                auto& h2Axis = *axises_[ AxisType::H2 ];
                 
-                controlBoard_ = std::make_unique< ControlBoard >( ctx, transport_, hvMS, bMS, beamInverted );
+                controlBoard_ = std::make_unique< ControlBoard >( ctx, transport_, hvMS, bMS, beamInverted, beamAxis.offset(), h1Axis.offset(), h2Axis.offset() );
                 auto const* kLeft = rj::GetValueByPointer( config, "/load_cell/lk" );
                 auto const* kRight = rj::GetValueByPointer( config, "/load_cell/rk" );
                 double lk = kLeft->GetDouble();

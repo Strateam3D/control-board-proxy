@@ -5,6 +5,7 @@
 #include "eq-common/Converter.hpp"
 #include "Symbols.hpp"
 #include "spdlog/spdlog.h"
+#include "BzOffset.hpp"
 
 // boost
 #include "Global.hpp"
@@ -45,11 +46,9 @@ namespace strateam{
 
                 f_ = [this]( MotionResult ret ){ notify( &ListenerInterface::motionDone, ret ); };
                 dim::MotorStep offMs = dim::DimensionConverter<dim::MotorStep>::apply( inverted_ ? offset.neg() : offset, stepsPerUm_ );
-                dim::MotorStep dExposureDistance = offMs + stepResidual_;
-                dim::MotorStep dist{0.0};
-                stepResidual_ = ModF( dExposureDistance, dist );
+                bzOffset_.addOffset( offMs );
                 dim::MotorStepVelocity vMS = dim::DimensionConverter<dim::MotorStepVelocity>::apply( speed, stepsPerUm_ );
-                auto response = transport_.sendRequestGetResponse( AxisImpl::move( dist, vMS.value() ) );
+                auto response = transport_.sendRequestGetResponse( AxisImpl::move( bzOffset_.offset(), vMS.value() ) );
                 MotionResult motret = AxisImpl::handleRespondCommandGo( response.getSource() );
                 handleMotionResult(motret);
                 return motret;
@@ -83,6 +82,7 @@ namespace strateam{
                 if( f_ )
                     return MotionResult::AlreadyMoving;
 
+                bzOffset_.reset();
                 dim::MotorStepVelocity vMS = dim::DimensionConverter<dim::MotorStepVelocity>::apply( speed, stepsPerUm_ );
                 f_ = [this]( MotionResult ret ){ notify( &ListenerInterface::moveToZeroDone, ret ); };
                 auto response = transport_.sendRequestGetResponse( AxisImpl::moveZero( vMS.value() ) );
@@ -120,6 +120,10 @@ namespace strateam{
 
             virtual void setHomePosition(dim::MotorStep const& pos) override{
                 homePosition_ = pos;
+            }
+
+            BzOffset<dim::MotorStep>& offset(){
+                return bzOffset_;
             }
         private:
             void startPeriodicalRequestMotionIsDone(){
@@ -201,7 +205,7 @@ namespace strateam{
             time_point_milliseconds beginWaitingTimePoint_ = std::chrono::time_point_cast<milliseconds>(std::chrono::system_clock::now());
             milliseconds waitForMotionDoneMaxDuration_ { 300000 };
 
-            dim::MotorStep                  stepResidual_{0.0};
+            BzOffset<dim::MotorStep>    bzOffset_;
             bool inverted_{ false };
         };
     }

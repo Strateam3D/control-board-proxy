@@ -5,6 +5,8 @@
 #include "dlp/DlpControlBoard.hpp"
 #include "interface/Result.hpp"
 #include "eq-common/Converter.hpp"
+#include "BzOffset.hpp"
+
 // std
 #include <chrono>
 
@@ -47,14 +49,20 @@ namespace strateam{
             time_point_milliseconds beginWaitingTimePoint_ = std::chrono::time_point_cast<milliseconds>(std::chrono::system_clock::now());
             milliseconds waitForMotionDoneMaxDuration_ { 300000 };
             bool inverted_{ false };
+            BzOffset<dim::MotorStep>&    beamOffset_;
+            BzOffset<dim::MotorStep>&    h1Offset_;
+            BzOffset<dim::MotorStep>&    h2Offset_;
 
         public:// == CTOR ==
-            BasicControlBoard( IoCtx& ctx, Transport& t, const double haydonStepsPerUM, const double beamStepsPerUM, bool beamInverted )
+            BasicControlBoard( IoCtx& ctx, Transport& t, const double haydonStepsPerUM, const double beamStepsPerUM, bool beamInverted, BzOffset<dim::MotorStep>& beamOffset, BzOffset<dim::MotorStep>& h1Offset, BzOffset<dim::MotorStep>& h2Offset )
             : ctx_( ctx )
             , transport_( t )
             , haydonStepsPerUM_( haydonStepsPerUM )
             , beamStepsPerUM_( beamStepsPerUM )
             , inverted_( beamInverted )
+            , beamOffset_( beamOffset )
+            , h1Offset_( h1Offset )
+            , h2Offset_( h2Offset )
             {}
 
             BasicControlBoard( BasicControlBoard const& ) = delete;
@@ -89,12 +97,19 @@ namespace strateam{
                 dim::MotorStepVelocity bvMS = dim::DimensionConverter< dim::MotorStepVelocity >::apply( beamVelocity, beamStepsPerUM_ );
                 dim::MotorStep haydonOffsetMs = dim::DimensionConverter<dim::MotorStep>::apply( inverted_ ? haydonOffset.neg() : haydonOffset, haydonStepsPerUM_ );
                 dim::MotorStepVelocity hvMS = dim::DimensionConverter< dim::MotorStepVelocity >::apply( haydonVelocity, haydonStepsPerUM_ );
+                beamOffset_.addOffset( beamOffsetMs );
+
+                if( hnum == 0 ) h1Offset_.addOffset( haydonOffsetMs );
+                else h2Offset_.addOffset( haydonOffsetMs );
+
+                dim::MotorStep  zBOffset = beamOffset_.offset();
+                dim::MotorStep zHOffset = hnum == 0 ? h1Offset_.offset() : h2Offset_.offset();
                 
                 auto response = transport_.sendRequestGetResponse( ControlBoardImpl::squeeze( 
                     hnum,
-                    beamOffsetMs.castTo<int>(),
+                    zBOffset.castTo<int>(),
                     bvMS.castTo<int>(),
-                    haydonOffsetMs.castTo<int>(),
+                    zHOffset.castTo<int>(),
                     hvMS.castTo<int>()) 
                 );
                 MotionResult motret = ControlBoardImpl::handleRespondCommandGo( response.getSource() );
