@@ -7,11 +7,11 @@ import time
 from paho.mqtt import client as mqtt_client
 
 
-broker = 'localhost'
+broker = '192.168.1.185'
 port = 1883
-topic="/strateam/pyclient-tool/control-board"
-rsp_topic="/strateam/pyclient-tool/control-board/rsp"
-status_topic="/strateam/pyclient-tool/control-board/notify"
+topic="/strateam/pyclient-tool/projector-equipment"
+rsp_topic="/strateam/pyclient-tool/projector-equipment/rsp"
+status_topic="/strateam/pyclient-tool/projector-equipment/notify"
 # Generate a Client ID with the publish prefix.
 client_id = f'publish-{random.randint(0, 1000)}'
 # username = 'emqx'
@@ -49,86 +49,47 @@ def connect_mqtt():
 
 def publish(client):
     
-    payload_squeeze= """
+    payload_poweron = """
     {
-        "equipment": {
-            "controlBoard" : {
-                "squeeze" : {
-                "hnum" : 1,
-                "bOffset" : 400.0,
-                "bv" : 40.0,
-                "hOffset" : 60.0,
-                "hv" : 6.0
-                }
-            }
-        }
-    }"""
-    # payload = """
-    # {
-    #     "equipment": {
-    #         "controlBoard" : {
-    #             "sendToUart" : true
-    #         }
-    #     }
-    # }"""
-    # payload = """
-    
-    # {
-    #     "equipment": {
-    #         "controlBoard" : {
-    #             "setZero" : true
-    #         }
-    #     }
-    # }"""
-
-    # payload = """
-    # {
-    #     "equipment": {
-    #         "controlBoard" : {
-    #             "stop" : true
-    #         }
-    #     }
-    # }"""
-
-    payload = """
-    {
-        "equipment": {
-            "axis" : {
-                "beam" : {
-                    "moveToZero" : {
-                        "spd" : 1000
-                    }
-                }
-            }
+        "projector": {
+            "powerOn" : true
         }
     }"""
 
-    payload_get_z_pos = """
+    payload_poweroff = """
     {
-        "equipment": {
-            "axis" : {
-                "z" : {
-                    "position" : null
-                }
-            }
+        "projector": {
+            "powerOn" : false
+        }
+    }"""
+
+    payload_led_poweron = """
+    {
+        "projector": {
+            "ledPowerOn" : true
+        }
+    }"""
+
+    payload_led_poweroff = """
+    {
+        "projector": {
+            "ledPowerOn" : false
         }
     }"""
 
 
-    payload_get_beam_pos = """
+    payload_display_img = """
     {
-        "equipment": {
-            "axis" : {
-                "beam" : {
-                    "position" : null
-                }
+        "projector": {
+            "display" : {
+                "path" : "fullwhite",
+                "time" : 5000
             }
         }
     }"""
-    
 
     time.sleep(1)
-    msg = payload_squeeze
+    msg = payload_display_img
     result = client.publish(topic, msg)
     # result: [0, 1]
     status = result[0]

@@ -9,40 +9,40 @@
                 {
                     "name": "motor1",
                     "homePos": -50000,
-                    "stepsPerUm" : 0.007875,
+                    "stepsPerUm" : 0.063,
                     "msPerInch"  : 20298
 
                 },
                 {
                     "name": "motor2",
                     "homePos": -50000,
-                    "stepsPerUm" : 0.007875,
+                    "stepsPerUm" : 0.063,
                     "msPerInch"  : 20298
                 },
                 {
                     "name": "motor3",
                     "homePos": -50000,
-                    "stepsPerUm" : 0.007875,
+                    "stepsPerUm" : 0.126,
                     "msPerInch"  : 20298
                 },
                 {
                     "name": "h1",
                     "homePos": -50000,
                     "inverted" : true,
-                    "stepsPerUm" : 0.63,
+                    "stepsPerUm" : 0.063,
                     "msPerInch"  : 20298
                 },
                 {
                     "name": "h2",
                     "homePos": -50000,
                     "inverted" : true,
-                    "stepsPerUm" : 0.63,
+                    "stepsPerUm" : 0.063,
                     "msPerInch"  : 20298
                 },
                 {
                     "name": "beam",
                     "homePos": -5000,
-                    "stepsPerUm" : 0.007875,
+                    "stepsPerUm" : 0.063,
                     "inverted" : true,
                     "msPerInch"  : 20298
                 }
