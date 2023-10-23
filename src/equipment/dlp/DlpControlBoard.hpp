@@ -27,6 +27,7 @@ namespace strateam{
                     rapidjson::Document doc( rj::kObjectType );
                     rj::SetValueByPointer( doc, "/load_cell/lk", lk );
                     rj::SetValueByPointer( doc, "/load_cell/rk", rk );
+                    rj::SetValueByPointer( doc, "/load_cell/iir_reset", true );
                     return doc;
                 }
 
