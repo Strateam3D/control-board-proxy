@@ -29,14 +29,14 @@
                     "name": "h1",
                     "homePos": -50000,
                     "inverted" : true,
-                    "stepsPerUm" : 0.63,
+                    "stepsPerUm" : 9.84375,
                     "msPerInch"  : 20298
                 },
                 {
                     "name": "h2",
                     "homePos": -50000,
                     "inverted" : true,
-                    "stepsPerUm" : 0.63,
+                    "stepsPerUm" : 9.84375,
                     "msPerInch"  : 20298
                 },
                 {
