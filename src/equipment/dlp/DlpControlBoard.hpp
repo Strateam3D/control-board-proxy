@@ -27,6 +27,7 @@ namespace strateam{
                     rapidjson::Document doc( rj::kObjectType );
                     rj::SetValueByPointer( doc, "/load_cell/lk", lk );
                     rj::SetValueByPointer( doc, "/load_cell/rk", rk );
+                    rj::SetValueByPointer( doc, "/load_cell/iir_reset", true );
                     return doc;
                 }
 
@@ -92,7 +93,10 @@ namespace strateam{
                 rapidjson::Document isMoving(){
                     rapidjson::Document req;
                     rj::SetValueByPointer( req, "/load_cell/monitor/squeeze/go", rj::kNullType );
-		    // rj::SetValueByPointer( req, "/load_cell/monitor/squeeze/position", rj::kNullType );
+
+                    rj::SetValueByPointer( req, "/beam/pos", rj::kNullType );
+                    rj::SetValueByPointer( req, "/h1/pos", rj::kNullType );
+
                     return req;
                 }
 
