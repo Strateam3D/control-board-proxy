@@ -13,9 +13,9 @@ client_id = f'publish-{random.randint(0, 1000)}'
 # Define max and min limits for distances and speeds for each axis
 axis_limits = {
     'beam': {'max_dist': 200, 'min_dist': -200, 'max_speed': 40, 'min_speed': 1},
-    'z': {'max_dist': 500, 'min_dist': -500, 'max_speed': 20, 'min_speed': 0.5},
-    'h1': {'max_dist': 100, 'min_dist': -100, 'max_speed': 5, 'min_speed': 0.01},
-    'h2': {'max_dist': 100, 'min_dist': -100, 'max_speed': 5, 'min_speed': 0.01},
+    'z': {'max_dist': 150, 'min_dist': -150, 'max_speed': 20, 'min_speed': 0.5},
+    'h1': {'max_dist': 100, 'min_dist': -100, 'max_speed': 10, 'min_speed': 0.01},
+    'h2': {'max_dist': 100, 'min_dist': -100, 'max_speed': 10, 'min_speed': 0.01},
 }
 
 def connect_mqtt():
