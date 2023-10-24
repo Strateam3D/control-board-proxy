@@ -4,8 +4,11 @@
 import random
 from tkinter import *
 from paho.mqtt import client as mqtt_client
+from tkinter import ttk
+from smb.SMBConnection import SMBConnection
+from smb import smb_structs
 
-broker = '192.168.1.185'
+broker = '192.168.49.19'
 port = 1883
 topic = "/strateam/pyclient-tool/control-board"
 client_id = f'publish-{random.randint(0, 1000)}'
@@ -61,7 +64,7 @@ def publish_command(client, axis, speed, offset, action_type):
     result = client.publish(topic, payload)
     status = result[0]
     if status == 0:
-        print(f"Sent {action_type} command to axis {axis}")
+        print(f"Sent {action_type} command to topic {topic}")
     else:
         print(f"Failed to send message to topic {topic}")
 
@@ -93,6 +96,10 @@ def update_slider_limits():
     limits = axis_limits[axis]
     speed_scale.config(from_=limits['min_speed'], to=limits['max_speed'])
     offset_scale.config(from_=limits['min_dist'], to=limits['max_dist'])
+
+
+def jobSelectionChanged( event ):
+    print( "selected job {}".format( currentJob.get() ) )
 
 # Create Speed slider
 speed_scale = Scale(window, from_=0, to=100, orient=HORIZONTAL, label="Speed (mm/sec)", length=300)
@@ -167,6 +174,58 @@ def on_jog_release():
     axis = axis_var.get()
     publish_command(client, axis, 0, 0, 'stop')
 
+
+def fetchJobList(jobsList):
+    # try:
+        smb_structs.SUPPORT_SMB2 = False
+        conn = SMBConnection( 'admin', 'admin', 'test client', broker )
+        conn.connect( broker, 139 )
+        results = conn.listPath('Job', '\\', pattern="Paste2Print*")
+        jobs = []
+        
+        if len(results) > 0:
+            for f in results:
+                print(f.filename)
+                # jobsList['values'].append(f.filename)
+                jobs.append(f.filename)
+    
+        jobsList[ 'values' ] = jobs
+        jobsList.set(jobs[0])
+
+def on_print_button_click(jobName):
+    payload = """
+    {{
+        "command": {{
+            "start" : {{
+                "path" : "/stratem/Job/{}"
+            }}
+        }}
+    }}""".format(jobName.get())
+    # print( "req {}".format(payload) )
+    result = client.publish(topic, payload)
+    status = result[0]
+    
+    if status == 0:
+        print(f"Sent print start print command for job {jobName.get()}")
+    else:
+        print(f"Failed to send cancel message for job {jobName.get()}")
+
+def on_cancel_button_click(jobName):
+    payload = """
+    {{
+        "command": {{
+            "cancel" : "Cancelled by user"
+        }}
+    }}"""
+    # print( "req {}".format(payload) )
+    result = client.publish(topic, payload)
+    status = result[0]
+    
+    if status == 0:
+        print(f"Sent cancel command for job {jobName.get()}")
+    else:
+        print(f"Failed to send cancel message for job {jobName.get()}")
+
 # Create jog buttons
 jog_plus_button = Button(window, text="Jog +", width=20)
 jog_plus_button.pack(side=TOP)
@@ -190,6 +249,18 @@ move_to_zero_button.pack(side=TOP)
 # Create Move button
 move_button = Button(window, text="Move", width=20, command=lambda: on_button_click("move"))
 move_button.pack(side=TOP)
+
+# jobs
+currentJob = StringVar()
+jobsCombobox = ttk.Combobox(window, textvariable=currentJob)
+jobsCombobox['state'] = 'readonly'
+jobsCombobox.pack(side=TOP)
+jobsCombobox.bind( '<<ComboboxSelected>>', jobSelectionChanged )
+fetchJobList(jobsCombobox)
+print_button = Button(window, text="Print", width=40, command=lambda: on_print_button_click(currentJob))
+print_button.pack(side=TOP)
+stop_button = Button(window, text="Stop", width=40, command=lambda: on_cancel_button_click(currentJob))
+stop_button.pack(side=TOP)
 
 # Run the application
 window.mainloop()
