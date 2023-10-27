@@ -8,41 +8,41 @@
             "axises" : [
                 {
                     "name": "motor1",
-                    "homePos": -50000,
+                    "homePos": 0,
                     "stepsPerUm" : 0.02,
                     "msPerInch"  : 20298
 
                 },
                 {
                     "name": "motor2",
-                    "homePos": -50000,
+                    "homePos": 0,
                     "stepsPerUm" : 0.02,
                     "msPerInch"  : 20298
                 },
                 {
                     "name": "motor3",
-                    "homePos": -50000,
+                    "homePos": -3220,
                     "stepsPerUm" : 0.1575,
                     "msPerInch"  : 20298
                 },
                 {
                     "name": "h1",
-                    "homePos": -50000,
+                    "homePos": 0,
                     "inverted" : true,
                     "stepsPerUm" : 9.84375,
                     "msPerInch"  : 20298
                 },
                 {
                     "name": "h2",
-                    "homePos": -50000,
+                    "homePos": 0,
                     "inverted" : true,
                     "stepsPerUm" : 9.84375,
                     "msPerInch"  : 20298
                 },
                 {
                     "name": "beam",
-                    "homePos": -5000,
-                    "stepsPerUm" : 0.02,
+                    "homePos": 0,
+                    "stepsPerUm" : 0.64,
                     "inverted" : true,
                     "msPerInch"  : 20298
                 }

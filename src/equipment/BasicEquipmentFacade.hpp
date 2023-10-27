@@ -45,7 +45,7 @@ namespace strateam{
                     AxisPtr axisPtr = std::make_unique<Axis>( ctx, axisName, transport_, stepsPerUm, inverted );
                     int hp = axisValue[ "homePos" ].GetInt();
                     
-                    axisPtr->setHomePosition( dim::MotorStep( hp ) );
+                    axisPtr->setHomePosition( dim::Um( hp ) );
                     axises_.emplace( static_cast<AxisType>( id ), std::move( axisPtr ) );
                 }
 
