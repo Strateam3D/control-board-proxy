@@ -84,14 +84,18 @@ namespace strateam{
 
                 bzOffset_.reset();
                 dim::MotorStepVelocity vMS = dim::DimensionConverter<dim::MotorStepVelocity>::apply( speed, stepsPerUm_ );
+		dim::MotorStep homePosMS = dim::DimensionConverter<dim::MotorStep>::apply(inverted_? homePosition_.neg(): homePosition_, stepsPerUm_);
                 f_ = [this]( MotionResult ret ){ notify( &ListenerInterface::moveToZeroDone, ret ); };
-                auto response = transport_.sendRequestGetResponse( AxisImpl::moveZero( vMS.value() ) );
+                auto response = transport_.sendRequestGetResponse( AxisImpl::moveZero( homePosMS.castTo<int>(), vMS.value() ) );
                 MotionResult motret = AxisImpl::handleRespondCommandGoZero( response.getSource() );
                 handleMotionResult(motret);
                 return motret;
             }
 
             virtual MotionResult moveHome( dim::UmVelocity speed, double accel, double decel ) override{
+		    spdlog::get( Symbols::Console() )->error( "move home to be refactored");
+		    return MotionResult::Failed;
+#if 0
                 dim::MotorStepVelocity vMS = dim::DimensionConverter<dim::MotorStepVelocity>::apply( speed, stepsPerUm_ );
                 
                 f_ = [this]( MotionResult ret ){ notify( &ListenerInterface::moveHomeDone, ret ); };
@@ -99,6 +103,7 @@ namespace strateam{
                 MotionResult motret = AxisImpl::handleRespondCommandGo( response.getSource() );
                 handleMotionResult(motret);
                 return motret;
+#endif
             }
 
             virtual void stop() override{
@@ -115,10 +120,10 @@ namespace strateam{
             }
 
             virtual dim::Um homePosition() override{
-                return dim::DimensionConverter<dim::Um> :: apply( homePosition_, stepsPerUm_ );
+                return homePosition_;
             }
 
-            virtual void setHomePosition(dim::MotorStep const& pos) override{
+            virtual void setHomePosition(dim::Um const& pos) override{
                 homePosition_ = pos;
             }
 
@@ -197,7 +202,7 @@ namespace strateam{
             const double                stepsPerUm_{1.0};
             boost::asio::deadline_timer isMotionDoneTimer_{ctx_};
             boost::posix_time::millisec isMotionDoneRequestPeriodMs_{300};
-            dim::MotorStep             homePosition_{0.0};
+            dim::Um             homePosition_{0.0};
             F                           f_;
 
             using time_point_milliseconds = std::chrono::time_point<std::chrono::system_clock, std::chrono::milliseconds>;

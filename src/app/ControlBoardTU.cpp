@@ -4,6 +4,10 @@
 #include "Symbols.hpp"
 #include "spdlog/spdlog.h"
 #include "eq-common/rjapi/Settings.hpp"
+#include "equipment/interface/EquipmentInterface.hpp"
+#include "equipment/interface/AxisInterface.hpp"
+
+
 
 //eq-common
 #include "eq-common/rjapi/Helper.hpp"
@@ -171,6 +175,7 @@ ControlBoardTU::ControlBoardTU( MQTTStack& stack, equipment::EquipmentInterface&
 : AbstractTU( ioPtr )
 , stack_( stack )
 , equipment_( equipment )
+//, statusTimer_( *io )
 {
 }
 

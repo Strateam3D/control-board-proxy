@@ -117,7 +117,7 @@ namespace strateam{
                     return req;
                 }
 
-                rj::Document moveZero( double speed = -1, double accel = -1, double decel = -1  ){
+                rj::Document moveZero(int homeOffset, double speed = -1, double accel = -1, double decel = -1  ){
                     fixSpeedAccelDecel( speed,accel,decel );
                     rapidjson::Document req(rj::kObjectType);
                     auto& al = req.GetAllocator();
@@ -125,6 +125,7 @@ namespace strateam{
                     params.AddMember("targspd",speed,al);
                     params.AddMember("accel", accel, al);  //Q_UNUSED(accel);//
                     params.AddMember("decel", decel, al);  //Q_UNUSED(decel);//
+		    params.AddMember("homeOffset", homeOffset, al);
                     params.AddMember("goZero",true,al);
                     req.AddMember( rj::Value( axisName_, al ), params, al );
                     return req;

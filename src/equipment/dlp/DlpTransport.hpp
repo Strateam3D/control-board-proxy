@@ -77,7 +77,7 @@ namespace strateam{
                         ba_.clear();
                         // assert( ba_.empty() );
                         resp.push_back( '\0' );
-                        spdlog::get( Symbols::Console() )->debug( "response {}, size: {}", resp.empty() ? "EMPTY" : resp.data(), resp.size());
+                        spdlog::get( Symbols::Console() )->debug( "response >{}<, size: {}", resp.empty() ? "EMPTY" : resp.data(), resp.size());
 
                         return MessageWrapper::fromData( resp.data() ).decode();
                     }else{

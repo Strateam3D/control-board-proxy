@@ -24,6 +24,9 @@ namespace strateam{
         class ControlBoardTU : public AbstractTU, public TUMessageVisitor{
         public: // == CONSTANTS ==
             static constexpr char const* RequestTopic(){ return "/strateam/+/control-board"; }
+	    static constexpr char const* StatusNotifyTopic(){
+	        return "/strateam/control-board/notify";
+	    }
 
         public:// == TYPES ==
             using DialogPtr = std::shared_ptr<Dialog>;

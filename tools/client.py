@@ -71,15 +71,15 @@ def publish(client):
     #         }
     #     }
     # }"""
-    # payload = """
+    payload_zero = """
     
-    # {
-    #     "equipment": {
-    #         "controlBoard" : {
-    #             "setZero" : true
-    #         }
-    #     }
-    # }"""
+    {
+        "equipment": {
+            "controlBoard" : {
+                "setZero" : true
+            }
+        }
+    }"""
 
     # payload = """
     # {
@@ -128,7 +128,7 @@ def publish(client):
     
 
     time.sleep(1)
-    msg = payload_squeeze
+    msg = payload_zero
     result = client.publish(topic, msg)
     # result: [0, 1]
     status = result[0]
