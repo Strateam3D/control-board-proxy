@@ -188,9 +188,8 @@ void ControlBoardTU::shutdown(){
 
 void ControlBoardTU::visit( ConnectedMessage & ){
     stack_.subscribe( RequestTopic(), 1 );
-
-    // statusTimer_.expires_from_now( boost::posix_time::seconds( 1 ) );
-    // statusTimer_.async_wait( std::bind( &ControlBoardTU::handleTimer, this, std::placeholders::_1 ) );
+    statusTimer_.expires_from_now( boost::posix_time::seconds( 1 ) );
+    statusTimer_.async_wait( std::bind( &ControlBoardTU::handleTimer, this, std::placeholders::_1 ) );
 }
 
 void ControlBoardTU::visit( ApplicationMessage& msg ){

@@ -93,10 +93,6 @@ namespace strateam{
                 rapidjson::Document isMoving(){
                     rapidjson::Document req;
                     rj::SetValueByPointer( req, "/load_cell/monitor/squeeze/go", rj::kNullType );
-
-                    rj::SetValueByPointer( req, "/beam/pos", rj::kNullType );
-                    rj::SetValueByPointer( req, "/h1/pos", rj::kNullType );
-
                     return req;
                 }
 
