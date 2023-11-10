@@ -52,6 +52,7 @@ if( BUILD_ARM )
         mqttStack
         rjapi
         spdlog::spdlog_header_only
+        usb-1.0
     )
 else()
     add_executable(${CONTROL_BOARD_TARGET} ${cb_src})
@@ -63,6 +64,7 @@ else()
         rjapi
         boost_program_options
         spdlog::spdlog_header_only
+        usb-1.0
     )    
 endif()
 

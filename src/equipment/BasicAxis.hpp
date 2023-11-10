@@ -21,6 +21,9 @@ namespace strateam{
             using Transport = typename TransportSelector<TagT>::type;
             using AxisImpl = typename AxisSelector<TagT>::type;
             using F = std::function<void(MotionResult)>;
+
+        public:
+            static constexpr int RetryAttempts = 2;
         public:// == ctor ==
             BasicAxis( IoCtx& ctx, std::string const& axisName, Transport& t, const double stepsPerUm, bool inverted ) 
             : AxisImpl( axisName )
@@ -48,9 +51,22 @@ namespace strateam{
                 dim::MotorStep offMs = dim::DimensionConverter<dim::MotorStep>::apply( inverted_ ? offset.neg() : offset, stepsPerUm_ );
                 bzOffset_.addOffset( offMs );
                 dim::MotorStepVelocity vMS = dim::DimensionConverter<dim::MotorStepVelocity>::apply( speed, stepsPerUm_ );
-                auto response = transport_.sendRequestGetResponse( AxisImpl::move( bzOffset_.offset(), vMS.value() ) );
-                MotionResult motret = AxisImpl::handleRespondCommandGo( response.getSource() );
-                handleMotionResult(motret);
+                int attempts = RetryAttempts;
+                MotionResult motret;
+                
+                do{
+                    auto response = transport_.sendRequestGetResponse( AxisImpl::move( bzOffset_.offset(), vMS.value() ) );
+                    motret = AxisImpl::handleRespondCommandGo( response.getSource() );
+                    handleMotionResult(motret);
+
+                    if( motret != MotionResult::ParseError )
+                        break;
+                    else
+                        spdlog::get( Symbols::Console() )->warn( "parse error, retries left {}", attempts );
+                    
+                    std::this_thread::sleep_for( std::chrono::milliseconds{200} );
+                }while( attempts -- > 0 );
+
                 return motret;
             }
 
@@ -67,15 +83,8 @@ namespace strateam{
                 return motret;
             }
 
-            virtual MotionResult moveTo( dim::MotorStep const& target, double speed, double , double )override{
-                if( f_ )
-                    return MotionResult::AlreadyMoving;
-
-                f_ = [this]( MotionResult ret ){ notify( &ListenerInterface::motionDone, ret ); };
-                auto response = transport_.sendRequestGetResponse( AxisImpl::moveTo( inverted_ ? target.neg() : target, speed ) );
-                MotionResult motret = AxisImpl::handleRespondCommandGo( response.getSource() );
-                handleMotionResult(motret);
-                return motret;
+            virtual MotionResult moveTo( dim::MotorStep const&, double , double , double )override{
+                return MotionResult::NotImplemented;
             }
 
             virtual MotionResult moveZero( dim::UmVelocity speed, double , double  ) override{
@@ -87,9 +96,22 @@ namespace strateam{
                 dim::MotorStep homePosMS = dim::DimensionConverter<dim::MotorStep>::apply(inverted_? homePosition_.neg(): homePosition_, stepsPerUm_);
 
                 f_ = [this]( MotionResult ret ){ notify( &ListenerInterface::moveToZeroDone, ret ); };
-                auto response = transport_.sendRequestGetResponse( AxisImpl::moveZero(  homePosMS.castTo<int>(), vMS.value() ) );
-                MotionResult motret = AxisImpl::handleRespondCommandGoZero( response.getSource() );
-                handleMotionResult(motret);
+                int attempts = RetryAttempts;
+                MotionResult motret;
+                
+                do{
+                    auto response = transport_.sendRequestGetResponse( AxisImpl::moveZero(  homePosMS.castTo<int>(), vMS.value() ) );
+                    motret = AxisImpl::handleRespondCommandGoZero( response.getSource() );
+                    handleMotionResult(motret);
+                    
+                    if( motret != MotionResult::ParseError )
+                        break;
+                    else
+                        spdlog::get( Symbols::Console() )->warn( "parse error, retries left {}", attempts );
+
+                    std::this_thread::sleep_for( std::chrono::milliseconds{200} );
+                }while( attempts -- > 0 );
+
                 return motret;
             }
 

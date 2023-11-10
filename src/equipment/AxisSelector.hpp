@@ -1,6 +1,8 @@
 #pragma once
 #include "IsDlp.hpp"
+#include "IsTM4C.hpp"
 #include "dlp/DlpAxis.hpp"
+#include "tm4c/TM4CAxis.hpp"
 
 namespace strateam{
     namespace equipment{
@@ -15,6 +17,11 @@ namespace strateam{
         template<typename TagT>
         struct AxisSelector<TagT, std::enable_if_t< IsDlpCheck< TagT >::value > > {
             using type = dlp::DlpAxis;
+        };
+
+        template<typename TagT>
+        struct AxisSelector<TagT, std::enable_if_t< IsTM4CCheck< TagT >::value > > {
+            using type = tm4c::TM4CAxis;
         };
     }
 }

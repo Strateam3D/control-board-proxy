@@ -1,5 +1,6 @@
 #include "makeEquipment.hpp"
 #include "dlp/DlpEquipment.hpp"
+#include "tm4c/TM4CEquipment.hpp"
 
 #include "rapidjson/pointer.h"
 namespace rj = rapidjson;
@@ -30,11 +31,17 @@ static bool isDlp( std::string const& name ){
     return name == "dlp" || name == "DLP";
 }
 
+static bool isTM4C( std::string const& name ){
+    return name == "tm4c" || name == "TM4C";
+}
+
 auto makeEquipment(IoCtx& ctx, rapidjson::Value const& config ) -> std::unique_ptr< EquipmentInterface >{
     std::string board = getBoardName(config);
     
     if( isDlp(board) ){
         return std::make_unique< dlp::DlpEquipment >( ctx, config );
+    }if( isTM4C( board ) ){
+        return std::make_unique< tm4c::TM4CEquipment >( ctx, config );
     }else{
         throw std::runtime_error(std::string("Unsupported control board, name: ")+board);
     }

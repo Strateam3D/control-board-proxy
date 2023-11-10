@@ -3,6 +3,7 @@
 #include "TransportSelector.hpp"
 #include "IsDlp.hpp"
 #include "dlp/DlpControlBoard.hpp"
+#include "tm4c/TM4CControlBoard.hpp"
 #include "interface/Result.hpp"
 #include "eq-common/Converter.hpp"
 #include "BzOffset.hpp"
@@ -26,6 +27,11 @@ namespace strateam{
         template<typename TagT>
         struct CBSelector<TagT, std::enable_if_t< IsDlpCheck< TagT >::value> > {
             using type = dlp::DlpControlBoard;
+        };
+
+        template<typename TagT>
+        struct CBSelector<TagT, std::enable_if_t< IsTM4CCheck< TagT >::value> > {
+            using type = tm4c::TM4CControlBoard;
         };
 
         template<typename TagT>
@@ -104,16 +110,28 @@ namespace strateam{
 
                 dim::MotorStep  zBOffset = beamOffset_.offset();
                 dim::MotorStep zHOffset = hnum == 0 ? h1Offset_.offset() : h2Offset_.offset();
+                MotionResult motret;
+                int attempts = 2;
                 
-                auto response = transport_.sendRequestGetResponse( ControlBoardImpl::squeeze( 
-                    hnum,
-                    zBOffset.castTo<int>(),
-                    bvMS.castTo<int>(),
-                    zHOffset.castTo<int>(),
-                    hvMS.castTo<int>()) 
-                );
-                MotionResult motret = ControlBoardImpl::handleRespondCommandGo( response.getSource() );
-                handleMotionResult(motret);
+                do{
+                    auto response = transport_.sendRequestGetResponse( ControlBoardImpl::squeeze( 
+                        hnum,
+                        zBOffset.castTo<int>(),
+                        bvMS.castTo<int>(),
+                        zHOffset.castTo<int>(),
+                        hvMS.castTo<int>()) 
+                    );
+                    motret = ControlBoardImpl::handleRespondCommandGo( response.getSource() );
+                    handleMotionResult(motret);
+
+                    if( motret != MotionResult::ParseError )
+                        break;
+                    else
+                        spdlog::get( Symbols::Console() )->warn( "parse error, retries left {}", attempts );
+                    
+                    std::this_thread::sleep_for( std::chrono::milliseconds{200} );
+                }while( attempts -- > 0 );
+
                 return motret;
             }
 

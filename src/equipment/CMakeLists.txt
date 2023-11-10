@@ -17,11 +17,19 @@ target_sources( ${CONTROL_BOARD_TARGET} PUBLIC
     IsJson.hpp
     Tags.hpp
     TransportSelector.hpp
+    IsSerial.hpp
+    IsTM4C.hpp
+    IsUsb.hpp
     
     dlp/DlpAxis.hpp
     dlp/DlpControlBoard.hpp
     dlp/DlpEquipment.hpp
     dlp/DlpTransport.hpp
+
+    tm4c/TM4CAxis.hpp
+    tm4c/TM4CControlBoard.hpp
+    tm4c/TM4CEquipment.hpp
+    tm4c/USBTransport.hpp
 
     interface/AxisInterface.hpp
     interface/EquipmentInterface.hpp

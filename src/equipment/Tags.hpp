@@ -7,6 +7,10 @@
 #include <type_traits>
 namespace strateam{
     namespace equipment{
+        struct Serial {
+            using IsSerial = boost::mpl::true_;
+        };
+
         struct Usb {
             using IsUsb = boost::mpl::true_;
         };
@@ -23,8 +27,12 @@ namespace strateam{
             using IsDlpBoard = boost::mpl::true_;
         };
 
-        using UsbJsonDlpTags = boost::mpl::vector<Usb, Json, DlpBoard> ;
-        // using UsbTextTags = boost::mpl::vector<Usb, Text>;
+        struct Tm4CBoard{
+            using IsTM4CBoard = boost::mpl::true_;
+        };
+
+        using SerialJsonDlpTags = boost::mpl::vector<Serial, Json, DlpBoard> ;
+        using UsbJsonTM4CTags = boost::mpl::vector<Usb, Json, Tm4CBoard>;
 
 #ifndef DEFINE_TRANSPORT_TAG
 #define DEFINE_TRANSPORT_TAG(name)																				\
@@ -34,8 +42,8 @@ namespace strateam{
 															 boost::mpl::placeholders::_2 > >::type{};
 #endif
 
-        DEFINE_TRANSPORT_TAG(UsbJsonDlp)
-        // DEFINE_TRANSPORT_TAG(UsbText)
+        DEFINE_TRANSPORT_TAG(SerialJsonDlp)
+        DEFINE_TRANSPORT_TAG(UsbJsonTM4C)
 
     }
 }

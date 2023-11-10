@@ -6,11 +6,13 @@ namespace strateam{
             enum E {
                 Success =0, Ok=Success,
                 AlreadyInPosition,
+                ParseError,
                 AlreadyMoving,
                 Interrupted, Stopped=Interrupted,
                 Timeout,
                 Failed, FAILED=Failed,
-                Accepted
+                Accepted,
+                NotImplemented
             };
         public:
             MotionResult() =default;
@@ -46,6 +48,8 @@ namespace strateam{
                 case Interrupted:        return "Interrupted";
                 case Timeout:            return "Timeout";
                 case FAILED:             return "FAILED";
+                case ParseError:        return "ParseError";
+                case NotImplemented:    return "NotImplemented";
                 default: return "UNKNOWN";
             }
         }

@@ -62,15 +62,15 @@ namespace strateam{
                 auto& h2Axis = *axises_[ AxisType::H2 ];
                 
                 controlBoard_ = std::make_unique< ControlBoard >( ctx, transport_, hvMS, bMS, beamInverted, beamAxis.offset(), h1Axis.offset(), h2Axis.offset() );
-                auto const* kLeft = rj::GetValueByPointer( config, "/load_cell/lk" );
-                auto const* kRight = rj::GetValueByPointer( config, "/load_cell/rk" );
-                double lk = kLeft->GetDouble();
-                double rk = kRight->GetDouble();
-                auto retval = controlBoard_->setLoadCellCoeffs( lk, rk );
+                // auto const* kLeft = rj::GetValueByPointer( config, "/load_cell/lk" );
+                // auto const* kRight = rj::GetValueByPointer( config, "/load_cell/rk" );
+                // double lk = kLeft->GetDouble();
+                // double rk = kRight->GetDouble();
+                // auto retval = controlBoard_->setLoadCellCoeffs( lk, rk );
 
-                if( retval != decltype(retval)::Success ){
-                    throw Exception( "Failed to set laod cell coefficients" );
-                }
+                // if( retval != decltype(retval)::Success ){
+                //     throw Exception( "Failed to set laod cell coefficients" );
+                // }
             }
 
         public:// == EquipmentInterafce ==
