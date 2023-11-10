@@ -48,9 +48,14 @@ namespace strateam{
             virtual void visit( ApplicationMessage& msg ) override;
 
         private:
+            void handleTimer( const boost::system::error_code& error );
+
+
+        private:
             MQTTStack&                      stack_;
             equipment::EquipmentInterface&  equipment_;
             DialogSetMap                    dialogs_;
+	    boost::asio::deadline_timer     statusTimer_;
         };
     }
 }

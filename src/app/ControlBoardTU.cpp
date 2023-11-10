@@ -175,7 +175,7 @@ ControlBoardTU::ControlBoardTU( MQTTStack& stack, equipment::EquipmentInterface&
 : AbstractTU( ioPtr )
 , stack_( stack )
 , equipment_( equipment )
-//, statusTimer_( *io )
+, statusTimer_( *ioPtr )
 {
 }
 
@@ -184,11 +184,14 @@ void ControlBoardTU::dispatchIncoming( std::shared_ptr<strateam::MessageInterfac
 }
 
 void ControlBoardTU::shutdown(){
+    statusTimer_.cancel();
     AbstractTU::shutdown();
 }
 
 void ControlBoardTU::visit( ConnectedMessage & ){
     stack_.subscribe( RequestTopic(), 1 );
+    statusTimer_.expires_from_now( boost::posix_time::seconds( 1 ) );
+    statusTimer_.async_wait( std::bind( &ControlBoardTU::handleTimer, this, std::placeholders::_1 ) );
 }
 
 void ControlBoardTU::visit( ApplicationMessage& msg ){
@@ -242,5 +245,51 @@ void ControlBoardTU::endDialog( std::string dialogId ){
 void ControlBoardTU::publish( mqtt::const_message_ptr msg ){
     stack_.publish( msg );
 }
+
+void ControlBoardTU::handleTimer( const boost::system::error_code& error ){
+    if( !error ){
+
+        try{
+
+            auto zpos = equipment_.axis( equipment::AxisType::Z ).position();
+
+            auto h1pos = equipment_.axis( equipment::AxisType::H1 ).position();
+
+            auto h2pos = equipment_.axis( equipment::AxisType::H2 ).position();
+
+            auto beampos = equipment_.axis( equipment::AxisType::beam ).position();
+
+            auto doc = std::make_shared<rj::Document>();
+
+            rj::SetValueByPointer( *doc, "/axis/z/pos", zpos.value() );
+
+            rj::SetValueByPointer( *doc, "/axis/h1/pos", h1pos.value() );
+
+            rj::SetValueByPointer( *doc, "/axis/h2/pos", h2pos.value() );
+
+            rj::SetValueByPointer( *doc, "/axis/beam/pos", beampos.value() );
+
+            rj::StringBuffer buffer = StringifyRjValue( *doc );
+
+            mqtt::message_ptr pubmsg = mqtt::make_message( StatusNotifyTopic(), buffer.GetString() );
+	    spdlog::get(Symbols::Console())->debug( "notify: {}", buffer.GetString() );
+
+            stack_.publish( pubmsg );
+
+        }catch( std::exception const& ex ){
+
+            spdlog::get( Symbols::Console() )->error( "notification err {}", ex.what() );
+
+        }
+
+
+        statusTimer_.expires_from_now( boost::posix_time::seconds( 1 ) );
+        statusTimer_.async_wait( std::bind( &ControlBoardTU::handleTimer, this, std::placeholders::_1 ) );
+
+    }
+
+}
+
+
 
 }
