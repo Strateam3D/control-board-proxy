@@ -119,6 +119,22 @@ constexpr const char* RegistryJsonStr = R"||(
                 "homePosition" : 123345,
                 "isMoving" : true
             },
+            "h3" : {
+                "moveHome": {
+                    "spd" : 1000
+                },
+                "moveToZero": {
+                    "spd" : 1000
+                },
+                "move": {
+                    "offset" : 1000,
+                    "spd" : 1000
+                },
+                "stop": true,
+                "position": 12345,
+                "homePosition" : 123345,
+                "isMoving" : true
+            },
             "beam" : {
                 "moveHome": {
                     "spd" : 1000

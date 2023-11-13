@@ -745,6 +745,128 @@ Dialog::Dialog( ControlBoardTU& tu, equipment::EquipmentInterface& eq, std::stri
             /*set*/nullptr
         )
     }
+
+// ----------------------------- h3 axis(h1 + h2) -----------------------------
+    , NamedGetterSetterPair{
+        rj::Pointer( "/equipment/axis/h3/moveHome" ),
+        GetterSetter(
+            /*get*/nullptr,
+            /*set*/[ this ]( rj::Value& v ) -> ResponseCode{
+                try{
+                    dim::UmVelocity  spd( v["spd"].GetInt() );
+                    auto& axis = equipment_.axis( equipment::AxisType::H3 );
+                    motret_ = axis.moveHome( spd );
+                    
+                    if ( motret_ == equipment::MotionResult::Accepted ){
+                        axis_ = "h3";
+                        return ResponseCode::Accepted;
+                    } else if ( motret_ == equipment::MotionResult::AlreadyInPosition ){
+                        return ResponseCode::Success;
+                    } else {
+                        throw equipment::Exception( motret_.str() );
+                    }
+                }catch( std::exception const& ex ){
+                    std::cout << "move home err: " << ex.what() << std::endl;
+                    return ResponseCode::Failed;
+                }
+            }
+        )
+    }
+    ,NamedGetterSetterPair{
+        rj::Pointer( "/equipment/axis/h3/moveToZero" ),
+        GetterSetter(
+            /*get*/nullptr,
+            /*set*/[ this ]( rj::Value& v ) -> ResponseCode{
+                try{
+                    dim::UmVelocity  spd( v["spd"].GetInt() );
+                    auto& axis = equipment_.axis( equipment::AxisType::H3 );
+                    motret_ = axis.moveZero( spd );
+                    
+                    if ( motret_ == equipment::MotionResult::Accepted ){
+                        axis_ = "h3";
+                        return ResponseCode::Accepted;
+                    } else if ( motret_ == equipment::MotionResult::AlreadyInPosition ){
+                        return ResponseCode::Success;
+                    } else {
+                        throw equipment::Exception( motret_.str() );
+                    }
+                }catch( std::exception const& ex ){
+                    std::cout << "move zero ex: " << ex.what() << std::endl;
+                    return ResponseCode::Failed;
+                }
+            }
+        )
+    }
+    ,NamedGetterSetterPair{
+        rj::Pointer( "/equipment/axis/h3/move" ),
+        GetterSetter(
+            /*get*/nullptr,
+            /*set*/[ this ]( rj::Value& v, rj::Value::AllocatorType& ) -> ResponseCode{
+                try{
+                    dim::UmVelocity  spd( v["spd"].GetInt() );
+                    dim::Um  offset( v["offset"].GetInt() );
+                    auto& axis = equipment_.axis( equipment::AxisType::H3 );
+                    motret_ = axis.move( offset , spd );
+                    
+                    if ( motret_ == equipment::MotionResult::Accepted ){
+                        axis_ = "h3";
+                        std::cout << motret_.str() << std::endl;
+                        // rj::Value rsp( int(ResponseCode::Accepted) );
+                        // v = rsp;
+                        return ResponseCode::Accepted;
+                    } else {
+                        throw equipment::Exception( motret_.str() );
+                    }
+                }catch( std::exception const& ex ){
+                    std::cout << "move ex: " << ex.what() << std::endl;
+                    return ResponseCode::Failed;
+                }
+            }
+        )
+    }
+    ,NamedGetterSetterPair{
+        rj::Pointer( "/equipment/axis/h3/stop" ),
+        GetterSetter(
+            /*get*/nullptr,
+            /*set*/[ this ]( rj::Value& ) -> ResponseCode{
+                try{
+                    auto& axis = equipment_.axis( equipment::AxisType::H3 );
+                    axis.stop();
+                    return ResponseCode::Success;
+                }catch( std::exception const& ex ){
+                    return ResponseCode::Failed;
+                }
+            }
+        )
+    }
+    ,NamedGetterSetterPair{
+        rj::Pointer( "/equipment/axis/h3/position" ),
+        GetterSetter(
+            /*get*/[this]() -> rj::Value{
+                return rj::Value( equipment_.axis( equipment::AxisType::H3 ).position().castTo<int>() );
+            },
+            /*set*/nullptr
+        )
+    }
+    ,NamedGetterSetterPair{
+        rj::Pointer( "/equipment/axis/h2/homePosition" ),
+        GetterSetter(
+            /*get*/[this]() -> rj::Value{
+                return rj::Value( equipment_.axis( equipment::AxisType::H3 ).homePosition().castTo<int>() );
+            },
+            /*set*/nullptr
+        )
+    }
+    ,NamedGetterSetterPair{
+        rj::Pointer( "/equipment/axis/h3/isMoving" ),
+        GetterSetter(
+            /*get*/[this]() -> rj::Value{
+                return rj::Value( equipment_.axis( equipment::AxisType::H3 ).isMoving() );
+            },
+            /*set*/nullptr
+        )
+    }
+
 // ----------------------------------------- control board -----------------------------------------
     ,NamedGetterSetterPair{
         rj::Pointer( "/equipment/controlBoard/coefs" ),
@@ -844,6 +966,7 @@ Dialog::Dialog( ControlBoardTU& tu, equipment::EquipmentInterface& eq, std::stri
     equipment_.axis( equipment::AxisType::Z ).subscribe( this );
     equipment_.axis( equipment::AxisType::H1 ).subscribe( this );
     equipment_.axis( equipment::AxisType::H2 ).subscribe( this );
+    equipment_.axis( equipment::AxisType::H3 ).subscribe( this );
     equipment_.axis( equipment::AxisType::beam ).subscribe( this );
     equipment_.controlBoard().subscribe( this );
     spdlog::get( Symbols::Console() )->debug( "Dialog::Dialog" );
@@ -855,6 +978,7 @@ Dialog::~Dialog(){
     equipment_.axis( equipment::AxisType::Z ).unsubscribe( this );
     equipment_.axis( equipment::AxisType::H1 ).unsubscribe( this );
     equipment_.axis( equipment::AxisType::H2 ).unsubscribe( this );
+    equipment_.axis( equipment::AxisType::H3 ).unsubscribe( this );
     equipment_.axis( equipment::AxisType::beam ).unsubscribe( this );
     equipment_.controlBoard().unsubscribe( this );
     spdlog::get( Symbols::Console() )->debug( "Dialog::~Dialog" );
