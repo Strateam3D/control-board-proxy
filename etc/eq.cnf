@@ -40,17 +40,17 @@
                     "msPerInch"  : 20298
                 },
                 {
+		    "name" : "h3",
+                    "homePos" : 0,
+                    "inverted" : true,
+		    "stepsPerUm" : 9.84375
+		},
+                {
                     "name": "beam",
                     "homePos": 0,
                     "stepsPerUm" : 0.64,
                     "inverted" : true,
                     "msPerInch"  : 20298
-                },
-                {
-                    "name": "h3",
-                    "homePos": 0,
-                    "inverted" : true,
-                    "stepsPerUm" : 9.84375
                 }
             ],
             "load_cell" : {

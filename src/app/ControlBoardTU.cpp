@@ -7,6 +7,8 @@
 #include "equipment/interface/EquipmentInterface.hpp"
 #include "equipment/interface/AxisInterface.hpp"
 
+
+
 //eq-common
 #include "eq-common/rjapi/Helper.hpp"
 
@@ -119,7 +121,7 @@ constexpr const char* RegistryJsonStr = R"||(
                 "homePosition" : 123345,
                 "isMoving" : true
             },
-            "h3" : {
+	    "h3" : {
                 "moveHome": {
                     "spd" : 1000
                 },
@@ -221,7 +223,7 @@ void ControlBoardTU::visit( ApplicationMessage& msg ){
             std::cout << "Parse error: " <<  rj::GetParseError_En( ec ) << std::endl;
             std::cout << payload << std::endl;
             static const std::string HelpResponse =
-            R"||(statusTimer_
+            R"||(
             "Usage syntax 1 named full json-style:
             '{"equipment": { "axis" : { "x" : { "move" : { "offset" : 1000 } } } } }'  # To move offset.
             '{"equipment": { "axis" : { "x" : { "position" : null } } } }'  # To get current position.
@@ -262,6 +264,7 @@ void ControlBoardTU::publish( mqtt::const_message_ptr msg ){
 
 void ControlBoardTU::handleTimer( const boost::system::error_code& error ){
     if( !error ){
+
         try{
             auto zpos = equipment_.axis( equipment::AxisType::Z ).position();
             auto h1pos = equipment_.axis( equipment::AxisType::H1 ).position();
@@ -273,15 +276,26 @@ void ControlBoardTU::handleTimer( const boost::system::error_code& error ){
             rj::SetValueByPointer( *doc, "/axis/h2/pos", h2pos.value() );
             rj::SetValueByPointer( *doc, "/axis/beam/pos", beampos.value() );
             rj::StringBuffer buffer = StringifyRjValue( *doc );
+
             mqtt::message_ptr pubmsg = mqtt::make_message( NotificationTopic(), buffer.GetString() );
+	        spdlog::get(Symbols::Console())->debug( "notify: {}", buffer.GetString() );
+
             stack_.publish( pubmsg );
+
         }catch( std::exception const& ex ){
+
             spdlog::get( Symbols::Console() )->error( "notification err {}", ex.what() );
+
         }
+
 
         statusTimer_.expires_from_now( boost::posix_time::seconds( 1 ) );
         statusTimer_.async_wait( std::bind( &ControlBoardTU::handleTimer, this, std::placeholders::_1 ) );
+
     }
+
 }
+
+
 
 }

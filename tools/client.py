@@ -63,21 +63,22 @@ def publish(client):
             }
         }
     }"""
-    payload_logs = """
+    # payload = """
+    # {
+    #     "equipment": {
+    #         "controlBoard" : {
+    #             "sendToUart" : true
+    #         }
+    #     }
+    # }"""
+    payload_zero = """
+    
     {
         "equipment": {
             "controlBoard" : {
-                "sendToUart" : true
+                "setZero" : true
             }
         }
-    }"""
-    payload_set_zero = """
-     {
-         "equipment": {
-             "controlBoard" : {
-                 "setZero" : true
-             }
-         }
     }"""
 
     # payload = """
@@ -127,7 +128,7 @@ def publish(client):
     
 
     time.sleep(1)
-    msg = payload_set_zero
+    msg = payload_zero
     result = client.publish(topic, msg)
     # result: [0, 1]
     status = result[0]

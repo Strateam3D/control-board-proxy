@@ -745,7 +745,6 @@ Dialog::Dialog( ControlBoardTU& tu, equipment::EquipmentInterface& eq, std::stri
             /*set*/nullptr
         )
     }
-
 // ----------------------------- h3 axis(h1 + h2) -----------------------------
     , NamedGetterSetterPair{
         rj::Pointer( "/equipment/axis/h3/moveHome" ),
@@ -768,7 +767,7 @@ Dialog::Dialog( ControlBoardTU& tu, equipment::EquipmentInterface& eq, std::stri
                 }catch( std::exception const& ex ){
                     std::cout << "move home err: " << ex.what() << std::endl;
                     return ResponseCode::Failed;
-                }
+               }
             }
         )
     }
@@ -823,7 +822,7 @@ Dialog::Dialog( ControlBoardTU& tu, equipment::EquipmentInterface& eq, std::stri
                 }
             }
         )
-    }
+  }
     ,NamedGetterSetterPair{
         rj::Pointer( "/equipment/axis/h3/stop" ),
         GetterSetter(
@@ -849,7 +848,7 @@ Dialog::Dialog( ControlBoardTU& tu, equipment::EquipmentInterface& eq, std::stri
         )
     }
     ,NamedGetterSetterPair{
-        rj::Pointer( "/equipment/axis/h2/homePosition" ),
+        rj::Pointer( "/equipment/axis/h3/homePosition" ),
         GetterSetter(
             /*get*/[this]() -> rj::Value{
                 return rj::Value( equipment_.axis( equipment::AxisType::H3 ).homePosition().castTo<int>() );
