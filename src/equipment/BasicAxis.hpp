@@ -87,20 +87,21 @@ namespace strateam{
                 return MotionResult::NotImplemented;
             }
 
-            virtual MotionResult moveZero( dim::UmVelocity speed, double , double  ) override{
+            //FIXME: refactor, need to implement move home as moveToZero + moveHome via request q
+            virtual MotionResult moveZero( dim::UmVelocity speed, dim::Um const& homeOffset, double , double  ) override{
                 if( f_ )
                     return MotionResult::AlreadyMoving;
 
                 bzOffset_.reset();
                 dim::MotorStepVelocity vMS = dim::DimensionConverter<dim::MotorStepVelocity>::apply( speed, stepsPerUm_ );
-                dim::MotorStep homePosMS = dim::DimensionConverter<dim::MotorStep>::apply(inverted_? homePosition_.neg(): homePosition_, stepsPerUm_);
+                dim::MotorStep homeOffMS = dim::DimensionConverter<dim::MotorStep>::apply(inverted_? homeOffset.neg(): homeOffset, stepsPerUm_);
 
                 f_ = [this]( MotionResult ret ){ notify( &ListenerInterface::moveToZeroDone, ret ); };
                 int attempts = RetryAttempts;
                 MotionResult motret;
                 
                 do{
-                    auto response = transport_.sendRequestGetResponse( AxisImpl::moveZero(  homePosMS.castTo<int>(), vMS.value() ) );
+                    auto response = transport_.sendRequestGetResponse( AxisImpl::moveZero( homeOffMS.castTo<int>(), vMS.value() ) );
                     motret = AxisImpl::handleRespondCommandGoZero( response.getSource() );
                     handleMotionResult(motret);
                     

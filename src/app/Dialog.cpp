@@ -299,8 +299,14 @@ Dialog::Dialog( ControlBoardTU& tu, equipment::EquipmentInterface& eq, std::stri
             /*set*/[ this ]( rj::Value& v ) -> ResponseCode{
                 try{
                     dim::UmVelocity  spd( v["spd"].GetInt() );
+
+                    auto const* offValue = rj::GetValueByPointer( v, "/offset" );
+                    dim::Um  offset{0.0};
+
+                    if( offValue ) offset.assign( offValue->GetInt() );
+
                     auto& axis = equipment_.axis( equipment::AxisType::Z );
-                    motret_ = axis.moveZero( spd );
+                    motret_ = axis.moveZero( spd, offset );
                     
                     if ( motret_ == equipment::MotionResult::Accepted ){
                         axis_ = "z";
