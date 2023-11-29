@@ -88,13 +88,13 @@ namespace strateam{
             }
 
             //FIXME: refactor, need to implement move home as moveToZero + moveHome via request q
-            virtual MotionResult moveZero( dim::UmVelocity speed, dim::Um const& homeOffset, double , double  ) override{
+            virtual MotionResult moveZero( dim::UmVelocity speed, double , double  ) override{
                 if( f_ )
                     return MotionResult::AlreadyMoving;
 
                 bzOffset_.reset();
                 dim::MotorStepVelocity vMS = dim::DimensionConverter<dim::MotorStepVelocity>::apply( speed, stepsPerUm_ );
-                dim::MotorStep homeOffMS = dim::DimensionConverter<dim::MotorStep>::apply(inverted_? homeOffset.neg(): homeOffset, stepsPerUm_);
+                dim::MotorStep homeOffMS = dim::DimensionConverter<dim::MotorStep>::apply(inverted_? homePosition_.neg(): homePosition_, stepsPerUm_);
 
                 f_ = [this]( MotionResult ret ){ notify( &ListenerInterface::moveToZeroDone, ret ); };
                 int attempts = RetryAttempts;

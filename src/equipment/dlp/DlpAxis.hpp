@@ -126,8 +126,7 @@ namespace strateam{
                     params.AddMember("accel", accel, al);  //Q_UNUSED(accel);//
                     params.AddMember("decel", decel, al);  //Q_UNUSED(decel);//
 		            
-                    if( homeOffset != 0 )
-                        params.AddMember("homeOffset", homeOffset, al);
+                    params.AddMember("homeOffset", homeOffset, al);
 
                     params.AddMember("goZero",true,al);
                     req.AddMember( rj::Value( axisName_, al ), params, al );

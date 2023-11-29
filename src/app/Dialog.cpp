@@ -4,6 +4,8 @@
 #include "equipment/interface/AxisInterface.hpp"
 #include "interface/ControlBoardInterface.hpp"
 #include "equipment/EqException.hpp"
+#include "eq-common/rjapi/Settings.hpp"
+#include "Symbols.hpp"
 
 #include <rapidjson/document.h>
 #include "rapidjson/PointedValueHandler.h"
@@ -300,13 +302,8 @@ Dialog::Dialog( ControlBoardTU& tu, equipment::EquipmentInterface& eq, std::stri
                 try{
                     dim::UmVelocity  spd( v["spd"].GetInt() );
 
-                    auto const* offValue = rj::GetValueByPointer( v, "/offset" );
-                    dim::Um  offset{0.0};
-
-                    if( offValue ) offset.assign( offValue->GetInt() );
-
                     auto& axis = equipment_.axis( equipment::AxisType::Z );
-                    motret_ = axis.moveZero( spd, offset );
+                    motret_ = axis.moveZero( spd );
                     
                     if ( motret_ == equipment::MotionResult::Accepted ){
                         axis_ = "z";
@@ -380,7 +377,12 @@ Dialog::Dialog( ControlBoardTU& tu, equipment::EquipmentInterface& eq, std::stri
             /*get*/[this]() -> rj::Value{
                 return rj::Value( equipment_.axis( equipment::AxisType::Z ).homePosition().castTo<int>() );
             },
-            /*set*/nullptr
+            /*set*/[this]( rj::Value& v ) -> ResponseCode{
+                equipment_.axis( equipment::AxisType::Z ).setHomePosition( dim::Um( v.GetInt() ) );
+                auto& settings = Settings::getInstance();
+                settings.setValue<int>( Symbols::ZAxisHomePos(), v.GetInt() );
+                return ResponseCode::Success;
+            }
         )
     }
     ,NamedGetterSetterPair{
