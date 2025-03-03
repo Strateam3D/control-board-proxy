@@ -2,8 +2,10 @@
 #include "interface/ControlBoardInterface.hpp"
 #include "TransportSelector.hpp"
 #include "IsDlp.hpp"
+#include "IsEmulator.hpp"
 #include "dlp/DlpControlBoard.hpp"
 #include "tm4c/TM4CControlBoard.hpp"
+#include "emulator/ControlBoard.hpp"
 #include "interface/Result.hpp"
 #include "eq-common/Converter.hpp"
 #include "BzOffset.hpp"
@@ -32,6 +34,11 @@ namespace strateam{
         template<typename TagT>
         struct CBSelector<TagT, std::enable_if_t< IsTM4CCheck< TagT >::value> > {
             using type = tm4c::TM4CControlBoard;
+        };
+
+        template<typename TagT>
+        struct CBSelector<TagT, std::enable_if_t< IsEmulator< TagT >::value> > {
+            using type = emulator::ControlBoard;
         };
 
         template<typename TagT>

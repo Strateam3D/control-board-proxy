@@ -29,6 +29,8 @@ namespace strateam{
             rapidjson::Document&            masterDocument_;
             equipment::MotionResult         motret_{ equipment::MotionResult::Success };
             std::string                     axis_;
+            int                             offset_{};
+            int                             targSpd_{};
         public:
             Dialog( ControlBoardTU& tu, equipment::EquipmentInterface& eq, std::string dialogId, rapidjson::Document& masterDocument );
             Dialog( Dialog const& ) = delete;

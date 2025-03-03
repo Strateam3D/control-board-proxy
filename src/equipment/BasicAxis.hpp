@@ -71,16 +71,17 @@ namespace strateam{
             }
 
             virtual MotionResult moveTo( dim::Um const& target,dim::UmVelocity speed, double, double )override{
-                if( f_ )
-                    return MotionResult::AlreadyMoving;
+                // if( f_ )
+                //     return MotionResult::AlreadyMoving;
 
-                dim::MotorStep tarMs = dim::DimensionConverter<dim::MotorStep>::apply( inverted_ ? target.neg() : target, stepsPerUm_ );
-                dim::MotorStepVelocity vMS = dim::DimensionConverter<dim::MotorStepVelocity>::apply( speed, stepsPerUm_ );
-                f_ = [this]( MotionResult ret ){ notify( &ListenerInterface::motionDone, ret ); };
-                auto response = transport_.sendRequestGetResponse( AxisImpl::moveTo( tarMs, vMS.value() ) );
-                MotionResult motret = AxisImpl::handleRespondCommandGo( response.getSource() );
-                handleMotionResult(motret);
-                return motret;
+                // dim::MotorStep tarMs = dim::DimensionConverter<dim::MotorStep>::apply( inverted_ ? target.neg() : target, stepsPerUm_ );
+                // dim::MotorStepVelocity vMS = dim::DimensionConverter<dim::MotorStepVelocity>::apply( speed, stepsPerUm_ );
+                // f_ = [this]( MotionResult ret ){ notify( &ListenerInterface::motionDone, ret ); };
+                // auto response = transport_.sendRequestGetResponse( AxisImpl::moveTo( tarMs, vMS.value() ) );
+                // MotionResult motret = AxisImpl::handleRespondCommandGo( response.getSource() );
+                // handleMotionResult(motret);
+                // return motret;
+                return MotionResult::NotImplemented;
             }
 
             virtual MotionResult moveTo( dim::MotorStep const&, double , double , double )override{
@@ -116,7 +117,7 @@ namespace strateam{
                 return motret;
             }
 
-            virtual MotionResult moveHome( dim::UmVelocity speed, double accel, double decel ) override{
+            virtual MotionResult moveHome( dim::UmVelocity , double , double  ) override{
                 spdlog::get( Symbols::Console() )->error( "move home to be refactored");
                 return MotionResult::FAILED;
                 // dim::MotorStepVelocity vMS = dim::DimensionConverter<dim::MotorStepVelocity>::apply( speed, stepsPerUm_ );

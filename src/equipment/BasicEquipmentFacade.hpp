@@ -26,7 +26,7 @@ namespace strateam{
 
         public:
             BasicEquipmentFacade( IoCtx& ctx, rapidjson::Value const& config )
-            : transport_( sureConfig( config, rj::Pointer("/controlBoard") ) ){
+            : transport_( ctx, sureConfig( config, rj::Pointer("/controlBoard") ) ){
                 auto const* val = rj::GetValueByPointer( config, "/axises" );
 
                 if( !val || !val->IsArray() ){

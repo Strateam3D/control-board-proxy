@@ -78,7 +78,8 @@
         "coroutine": "cpp",
         "source_location": "cpp",
         "span": "cpp",
-        "cfenv": "cpp"
+        "cfenv": "cpp",
+        "shared_mutex": "cpp"
     },
     "cmake.configureOnOpen": false
 }

@@ -15,6 +15,10 @@ namespace strateam{
             using IsUsb = boost::mpl::true_;
         };
 
+        struct Emu {
+            using IsEmu = boost::mpl::true_;
+        };
+
         struct Json {
             using IsJson = boost::mpl::true_;
         };
@@ -33,7 +37,7 @@ namespace strateam{
 
         using SerialJsonDlpTags = boost::mpl::vector<Serial, Json, DlpBoard> ;
         using UsbJsonTM4CTags = boost::mpl::vector<Usb, Json, Tm4CBoard>;
-
+        using EmuJsonTags = boost::mpl::vector< Emu, Json >;
 #ifndef DEFINE_TRANSPORT_TAG
 #define DEFINE_TRANSPORT_TAG(name)																				\
 	struct name																							\
@@ -44,6 +48,6 @@ namespace strateam{
 
         DEFINE_TRANSPORT_TAG(SerialJsonDlp)
         DEFINE_TRANSPORT_TAG(UsbJsonTM4C)
-
+        DEFINE_TRANSPORT_TAG(EmuJson)
     }
 }

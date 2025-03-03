@@ -1,8 +1,11 @@
 #pragma once
 #include "IsDlp.hpp"
 #include "IsTM4C.hpp"
+#include "IsEmulator.hpp"
+
 #include "dlp/DlpAxis.hpp"
 #include "tm4c/TM4CAxis.hpp"
+#include "emulator/EmulatorAxis.hpp"
 
 namespace strateam{
     namespace equipment{
@@ -22,6 +25,11 @@ namespace strateam{
         template<typename TagT>
         struct AxisSelector<TagT, std::enable_if_t< IsTM4CCheck< TagT >::value > > {
             using type = tm4c::TM4CAxis;
+        };
+
+        template<typename TagT>
+        struct AxisSelector<TagT, std::enable_if_t< IsEmulator< TagT >::value > > {
+            using type = emulator::EmulatorAxis;
         };
     }
 }

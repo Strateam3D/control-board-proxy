@@ -32,7 +32,7 @@ namespace strateam{
                 int baudRate_{ 115200 };
 
             public:// == CTOR ==
-                DlpTransport( rapidjson::Value const& config )
+                DlpTransport( IoCtx&, rapidjson::Value const& config )
                 : deviceName_( "/dev/ttyACM0" ){
                     setConfig(config);
                     openConnection();

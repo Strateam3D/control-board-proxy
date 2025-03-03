@@ -30,7 +30,7 @@ namespace strateam{
                 uint vid_{ VID };
                 uint pid_{ PID };
             public:// == CTOR ==
-                USBTransport( rapidjson::Value const& config ){
+                USBTransport( IoCtx& , rapidjson::Value const& config ){
                     libusb_init(nullptr);
                     setConfig(config);
                     openConnection();
