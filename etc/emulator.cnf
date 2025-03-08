@@ -1,0 +1,20 @@
+{
+    "equipment": {
+            "controlBoard" : {
+                "name" : "emulator"
+            },
+            "axises" : [
+                {
+                    "name": "z",
+                    "homePos": -3220,
+                    "stepsPerUm" : 0.1575,
+                    "msPerInch"  : 20298,
+                    "id" : 2
+                }
+            ]
+    },
+    "mqtt" : {
+        "address" : "tcp://localhost:1883",
+        "clientId" : "mqtt-control-board-proxy"
+    }
+}

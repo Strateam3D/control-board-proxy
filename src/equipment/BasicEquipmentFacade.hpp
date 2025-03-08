@@ -39,29 +39,31 @@ namespace strateam{
                 for( rj::Value::ConstValueIterator it = axises.Begin(); it != axises.End(); it++, id ++ ){
                     const rj::Value::ConstObject& axisValue = it->GetObject();
                     std::string axisName = axisValue[ "name" ].GetString();
-                    std::cout << "Creating axis " << axisName << std::endl;
                     double stepsPerUm = axisValue[ "stepsPerUm" ].GetDouble();
                     bool inverted = axisValue.HasMember( "inverted" ) && axisValue["inverted"].GetBool();
                     AxisPtr axisPtr = std::make_unique<Axis>( ctx, axisName, transport_, stepsPerUm, inverted );
                     int hp = axisValue[ "homePos" ].GetInt();
+                    int axisId = axisValue[ "id" ].GetInt();
                     
                     axisPtr->setHomePosition( dim::Um( hp ) );
-                    axises_.emplace( static_cast<AxisType>( id ), std::move( axisPtr ) );
+                    std::cout << "Creating axis " << axisName << ", id: " << axisId << std::endl;
+                    axises_.emplace( static_cast<AxisType>( axisId ), std::move( axisPtr ) );
                 }
 
-                auto const* haydonStepsPerUmValue = rj::GetValueByPointer( config, "/axises/3/stepsPerUm" );
-                double hvMS = haydonStepsPerUmValue->GetDouble();
+                // auto const* haydonStepsPerUmValue = rj::GetValueByPointer( config, "/axises/3/stepsPerUm" );
+                // double hvMS = haydonStepsPerUmValue->GetDouble();
                 
-                auto const* beamStepsPerUmValue = rj::GetValueByPointer( config, "/axises/5/stepsPerUm" );
-                double bMS = beamStepsPerUmValue->GetDouble();
+                // auto const* beamStepsPerUmValue = rj::GetValueByPointer( config, "/axises/5/stepsPerUm" );
+                // double bMS = beamStepsPerUmValue->GetDouble();
 
-                auto const* beamInvertedValue = rj::GetValueByPointer( config, "/axises/5/inverted" );
-                bool beamInverted = beamInvertedValue->GetBool();
-                auto& beamAxis = *axises_[ AxisType::beam ];
-                auto& h1Axis = *axises_[ AxisType::H1 ];
-                auto& h2Axis = *axises_[ AxisType::H2 ];
+                // auto const* beamInvertedValue = rj::GetValueByPointer( config, "/axises/5/inverted" );
+                // bool beamInverted = beamInvertedValue->GetBool();
+                // auto& beamAxis = *axises_[ AxisType::beam ];
+                // auto& h1Axis = *axises_[ AxisType::H1 ];
+                // auto& h2Axis = *axises_[ AxisType::H2 ];
                 
-                controlBoard_ = std::make_unique< ControlBoard >( ctx, transport_, hvMS, bMS, beamInverted, beamAxis.offset(), h1Axis.offset(), h2Axis.offset() );
+                // controlBoard_ = std::make_unique< ControlBoard >( ctx, transport_, hvMS, bMS, beamInverted, beamAxis.offset(), h1Axis.offset(), h2Axis.offset() );
+                
                 // auto const* kLeft = rj::GetValueByPointer( config, "/load_cell/lk" );
                 // auto const* kRight = rj::GetValueByPointer( config, "/load_cell/rk" );
                 // double lk = kLeft->GetDouble();
@@ -75,7 +77,7 @@ namespace strateam{
 
         public:// == EquipmentInterafce ==
             virtual AxisInterface& axis( AxisType axis ) override{
-                if( !axises_.count( axis ) ) throw Exception( "Invalid axis requested" );
+                if( !axises_.count( axis ) ) throw Exception( "Invalid axis requested " + std::to_string( axis ) );
                 return *axises_[ axis ];
             }
 

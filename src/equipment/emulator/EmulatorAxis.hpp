@@ -5,7 +5,8 @@
 #include "eq-common/Dimensions.hpp"
 #include "../interface/MotionResult.hpp"
 #include "../EqException.hpp"
-
+#include "spdlog/spdlog.h"
+#include "eq-common/rjapi/Helper.hpp"
 
 namespace strateam{
     namespace equipment{
@@ -149,6 +150,7 @@ namespace strateam{
                 auto const* val = rj::GetValueByPointer( doc, rj::Pointer( ( pointerName_ + "/pos" ).c_str() ) );
 
                 if( !val || !val->IsInt() ){
+                    spdlog::get( "console" )->debug( "debug: {}", StringifyRjValue( doc ).GetString() );
                     throw Exception("Wrong position response");
                 }
 

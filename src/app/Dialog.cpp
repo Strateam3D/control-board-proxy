@@ -67,8 +67,10 @@ Dialog::Dialog( ControlBoardTU& tu, equipment::EquipmentInterface& eq, std::stri
    , NamedGetterSetterPair{
         rj::Pointer( "/z/go" ),
         GetterSetter(
-            /*get*/nullptr,
-            /*set*/[ this ]( rj::Value& v, rj::Value::AllocatorType& ) -> ResponseCode{
+            /*get*/[this]() -> rj::Value{
+                return rj::Value( equipment_.axis( equipment::AxisType::Z ).isMoving() );
+            },
+            /*set*/[ this ]( rj::Value& v ) -> ResponseCode{
                 try{
                     if( v.GetBool() ){
                         dim::UmVelocity  spd( targSpd_ );
@@ -100,8 +102,10 @@ Dialog::Dialog( ControlBoardTU& tu, equipment::EquipmentInterface& eq, std::stri
     , NamedGetterSetterPair{
         rj::Pointer( "/z/goZero" ),
         GetterSetter(
-            /*get*/nullptr,
-            /*set*/[ this ]( rj::Value& v, rj::Value::AllocatorType& ) -> ResponseCode{
+            /*get*/[this]() -> rj::Value{
+                return rj::Value( equipment_.axis( equipment::AxisType::Z ).isMoving() );
+            },
+            /*set*/[ this ]( rj::Value& v ) -> ResponseCode{
                 try{
                     if( v.GetBool() ){
                         dim::UmVelocity  spd( targSpd_ );

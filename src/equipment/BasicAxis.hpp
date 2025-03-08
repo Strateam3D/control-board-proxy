@@ -70,7 +70,7 @@ namespace strateam{
                 return motret;
             }
 
-            virtual MotionResult moveTo( dim::Um const& target,dim::UmVelocity speed, double, double )override{
+            virtual MotionResult moveTo( dim::Um const& ,dim::UmVelocity , double, double )override{
                 // if( f_ )
                 //     return MotionResult::AlreadyMoving;
 
