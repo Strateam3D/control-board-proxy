@@ -84,6 +84,21 @@ namespace strateam{
                         }
                     }
 
+                    rj::Value const* goHomeValue = rj::GetValueByPointer( request, "/goHome" );
+
+                    if( goHomeValue ){
+                        if( goHomeValue->GetBool() ){
+                            targetPos_ = -20000;
+                            initTimer( 1000 );
+                            rj::Document ans( rj::kObjectType );
+                            rj::SetValueByPointer( ans, rj::Pointer( axis_ + "/goHome" ), true );
+                            return MessageWrapper::fromSource( ans );
+                        }else{
+                            motTimer_.cancel();
+                            return {};
+                        }
+                    }
+
                     rj::Value const* posValue = rj::GetValueByPointer( request, "/pos" );
 
                     if( posValue && posValue->IsNull() ){

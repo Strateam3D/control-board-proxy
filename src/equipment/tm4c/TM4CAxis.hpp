@@ -55,6 +55,10 @@ namespace strateam{
                     return req;
                 }
 
+                rj::Document moveHome(int , double  = -1, double = -1, double = -1  ){
+                    return {};
+                }
+
                 bool isMovingResult( rj::Document const& doc ){
                     rj::Pointer p( ( pointerName_ + "/go" ).c_str());
                     auto const* val = rj::GetValueByPointer( doc, p );
@@ -138,6 +142,33 @@ namespace strateam{
                         auto const* errval = rj::GetValueByPointer( doc, "/Error" );
 
                         if( errval && errval->IsInt() && errval->GetInt() == ParseErrorResponse )
+                            return MotionResult::ParseError;
+                            
+                        return MotionResult::FAILED;
+                    }
+
+                    if( val->IsString() ){
+                        std::string rsp = val->GetString();
+
+                        if( rsp.find( "Already in the targetPosition" ) != std::string::npos || rsp.find( "AlreadyInPosition" ) != std::string::npos ){
+                            // std::cout << "aaaaaaaaaa AlreadyInPosition\n";
+                            return MotionResult::AlreadyInPosition;
+                        }else{
+                            // std::cout << __func__ << "ERR: " << rsp << std::endl;
+                            return MotionResult::FAILED;
+                        }
+                    }
+
+                    return val->GetBool() ? MotionResult::Accepted : MotionResult::FAILED;
+                }
+
+                MotionResult handleRespondCommandGoHome( rj::Document const& doc ){
+                    auto const* val = rj::GetValueByPointer( doc, rj::Pointer( ( pointerName_ + "/goHome" ).c_str() ) );
+
+                    if( !val ){
+                        auto const* errval = rj::GetValueByPointer( doc, "/Error" );
+
+                        if( errval && errval->IsInt() )
                             return MotionResult::ParseError;
                             
                         return MotionResult::FAILED;

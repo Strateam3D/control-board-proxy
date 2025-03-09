@@ -64,6 +64,37 @@ namespace strateam{
                     return val->GetBool();
                 }
 
+                rj::Document moveHome(int , double  = -1, double = -1, double = -1  ){
+                    return {};
+                }
+
+                MotionResult handleRespondCommandGoHome( rj::Document const& doc ){
+                    auto const* val = rj::GetValueByPointer( doc, rj::Pointer( ( pointerName_ + "/goHome" ).c_str() ) );
+
+                    if( !val ){
+                        auto const* errval = rj::GetValueByPointer( doc, "/Error" );
+
+                        if( errval && errval->IsInt() )
+                            return MotionResult::ParseError;
+                            
+                        return MotionResult::FAILED;
+                    }
+
+                    if( val->IsString() ){
+                        std::string rsp = val->GetString();
+
+                        if( rsp.find( "Already in the targetPosition" ) != std::string::npos || rsp.find( "AlreadyInPosition" ) != std::string::npos ){
+                            // std::cout << "aaaaaaaaaa AlreadyInPosition\n";
+                            return MotionResult::AlreadyInPosition;
+                        }else{
+                            // std::cout << __func__ << "ERR: " << rsp << std::endl;
+                            return MotionResult::FAILED;
+                        }
+                    }
+
+                    return val->GetBool() ? MotionResult::Accepted : MotionResult::FAILED;
+                }
+
                 rj::Document move( dim::MotorStep const& offset, double speed = -1, double accel = -1, double decel = -1 ){
                     fixSpeedAccelDecel( speed,accel,decel );
                     rapidjson::Document req(rj::kObjectType);

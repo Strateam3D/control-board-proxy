@@ -44,7 +44,8 @@ constexpr const char* RegistryJsonStr = R"||(
         "targspd" : 100,
         "go" : true,
         "goZero" : true,
-        "pos" : null
+        "pos" : null,
+        "goHome" : true
     }
 }
 )||";

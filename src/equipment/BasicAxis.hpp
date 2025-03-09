@@ -117,16 +117,16 @@ namespace strateam{
                 return motret;
             }
 
-            virtual MotionResult moveHome( dim::UmVelocity , double , double  ) override{
-                spdlog::get( Symbols::Console() )->error( "move home to be refactored");
-                return MotionResult::FAILED;
-                // dim::MotorStepVelocity vMS = dim::DimensionConverter<dim::MotorStepVelocity>::apply( speed, stepsPerUm_ );
+            virtual MotionResult moveHome( dim::UmVelocity speed, double , double  ) override{
+                // spdlog::get( Symbols::Console() )->error( "move home to be refactored");
+                // return MotionResult::FAILED;
+                dim::MotorStepVelocity vMS = dim::DimensionConverter<dim::MotorStepVelocity>::apply( speed, stepsPerUm_ );
                 
-                // f_ = [this]( MotionResult ret ){ notify( &ListenerInterface::moveHomeDone, ret ); };
-                // auto response = transport_.sendRequestGetResponse( AxisImpl::moveTo( homePosition_, vMS.value() ) );
-                // MotionResult motret = AxisImpl::handleRespondCommandGo( response.getSource() );
-                // handleMotionResult(motret);
-                // return motret;
+                f_ = [this]( MotionResult ret ){ notify( &ListenerInterface::moveHomeDone, ret ); };
+                auto response = transport_.sendRequestGetResponse( AxisImpl::moveHome( homePosition_.castTo<int>(), vMS.value() ) );
+                MotionResult motret = AxisImpl::handleRespondCommandGoHome( response.getSource() );
+                handleMotionResult(motret);
+                return motret;
             }
 
             virtual void stop() override{

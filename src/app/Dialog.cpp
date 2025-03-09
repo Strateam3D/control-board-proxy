@@ -134,6 +134,40 @@ Dialog::Dialog( ControlBoardTU& tu, equipment::EquipmentInterface& eq, std::stri
             }
         )
     }
+    , NamedGetterSetterPair{
+        rj::Pointer( "/z/goHome" ),
+        GetterSetter(
+            /*get*/[this]() -> rj::Value{
+                return rj::Value( equipment_.axis( equipment::AxisType::Z ).isMoving() );
+            },
+            /*set*/[ this ]( rj::Value& v ) -> ResponseCode{
+                try{
+                    if( v.GetBool() ){
+                        auto& axis = equipment_.axis( equipment::AxisType::Z );
+                        dim::UmVelocity  spd( targSpd_ );
+                        motret_ = axis.moveHome( spd );
+                        
+                        if ( motret_ == equipment::MotionResult::Accepted ){
+                            axis_ = "z";
+                            std::cout << motret_.str() << std::endl;
+                            // rj::Value rsp( int(ResponseCode::Accepted) );
+                            // v = rsp;
+                            return ResponseCode::Accepted;
+                        } else {
+                            throw equipment::Exception( motret_.str() );
+                        }
+                    }else{
+                        auto& axis = equipment_.axis( equipment::AxisType::Z );
+                        axis.stop();
+                        return ResponseCode::Success;    
+                    }
+                }catch( std::exception const& ex ){
+                    std::cout << "move ex: " << ex.what() << std::endl;
+                    return ResponseCode::Failed;
+                }
+            }
+        )
+    }
     ,NamedGetterSetterPair{
         rj::Pointer( "/z/stop" ),
         GetterSetter(

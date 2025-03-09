@@ -88,6 +88,18 @@ namespace strateam{
                     return req;
                 }
 
+                rj::Document moveHome(int homeOffset, double speed = -1, double = -1, double = -1  ){
+                    rapidjson::Document req(rj::kObjectType);
+                    auto& al = req.GetAllocator();
+                    rj::Value params( rj::kObjectType );
+                    params.AddMember("targspd",static_cast<int>( speed ),al);
+                    params.AddMember("goHome",true,al);
+                    req.AddMember( rj::Value( axisName_, al ), params, al );
+
+                    spdlog::get( "console" )->debug( "movehome debug: {}", StringifyRjValue( req ).GetString() );
+                    return req;
+                }
+
                 MotionResult handleRespondCommandGoZero( rj::Document const& doc ){
                     auto const* val = rj::GetValueByPointer( doc, rj::Pointer( ( pointerName_ + "/goZero" ).c_str() ) );
 
@@ -113,7 +125,34 @@ namespace strateam{
                     }
 
                     return val->GetBool() ? MotionResult::Accepted : MotionResult::FAILED;
-                }                
+                }
+                
+                MotionResult handleRespondCommandGoHome( rj::Document const& doc ){
+                    auto const* val = rj::GetValueByPointer( doc, rj::Pointer( ( pointerName_ + "/goHome" ).c_str() ) );
+
+                    if( !val ){
+                        auto const* errval = rj::GetValueByPointer( doc, "/Error" );
+
+                        if( errval && errval->IsInt() )
+                            return MotionResult::ParseError;
+                            
+                        return MotionResult::FAILED;
+                    }
+
+                    if( val->IsString() ){
+                        std::string rsp = val->GetString();
+
+                        if( rsp.find( "Already in the targetPosition" ) != std::string::npos || rsp.find( "AlreadyInPosition" ) != std::string::npos ){
+                            // std::cout << "aaaaaaaaaa AlreadyInPosition\n";
+                            return MotionResult::AlreadyInPosition;
+                        }else{
+                            // std::cout << __func__ << "ERR: " << rsp << std::endl;
+                            return MotionResult::FAILED;
+                        }
+                    }
+
+                    return val->GetBool() ? MotionResult::Accepted : MotionResult::FAILED;
+                }
 
                 rj::Document stop(){
                     rj::Document req;
